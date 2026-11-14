@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563EB">
+<meta name="description" content="陆涛《有机化学》第9版配套考前刷题应用">
+<title>有机化学考前刷题</title>
+<style>
+:root{
+  --c-primary:#2563EB; --c-primary-dark:#1D4ED8; --c-primary-light:#EFF6FF;
+  --c-correct:#16A34A; --c-correct-bg:#F0FDF4; --c-wrong:#DC2626; --c-wrong-bg:#FEF2F2;
+  --c-warn:#D97706; --c-text:#111827; --c-text2:#6B7280; --c-border:#E5E7EB;
+  --c-bg:#F3F4F6; --c-card:#FFFFFF; --radius:16px;
+  --shadow:0 1px 3px rgba(17,24,39,.08),0 6px 18px rgba(17,24,39,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei","Segoe UI",sans-serif;background:var(--c-bg);color:var(--c-text);line-height:1.65;padding-bottom:env(safe-area-inset-bottom)}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px 30px}
+button{font-family:inherit}
+
+/* ── 页面切换 ── */
+.page{display:none}
+.page.active{display:block;animation:pageIn .25s ease}
+@keyframes pageIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ── 首页头部 ── */
+header{background:linear-gradient(135deg,#2563EB 0%,#4F8EF7 60%,#6FA8FF 100%);color:#fff;padding:22px 16px 18px;border-radius:0 0 24px 24px;box-shadow:var(--shadow)}
+header .wrap{padding-bottom:0}
+.hd-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+h1{font-size:21px;font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+h1 .logo{font-size:24px}
+.hd-sub{font-size:12px;opacity:.85;margin-top:2px}
+.hd-btns{display:flex;gap:8px;flex-shrink:0}
+.hd-chip{border:1px solid rgba(255,255,255,.45);background:rgba(255,255,255,.14);color:#fff;font-size:12px;padding:7px 13px;border-radius:999px;cursor:pointer;transition:.15s;backdrop-filter:blur(4px)}
+.hd-chip:hover{background:rgba(255,255,255,.28)}
+.hd-chip.primary{background:#fff;color:var(--c-primary);border-color:#fff;font-weight:600}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px}
+.stat{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:12px;padding:9px 4px;text-align:center;backdrop-filter:blur(4px)}
+.stat b{display:block;font-size:17px;font-weight:700}
+.stat span{font-size:11px;opacity:.85}
+
+/* ── 板块卡片 ── */
+.sec-list{display:flex;flex-direction:column;gap:14px;margin-top:18px}
+.sec-card{display:flex;align-items:center;gap:16px;background:var(--c-card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 18px;cursor:pointer;transition:.18s;border:1.5px solid transparent}
+.sec-card:hover{transform:translateY(-3px);box-shadow:0 8px 26px rgba(37,99,235,.16);border-color:#BFDBFE}
+.sec-card:active{transform:scale(.985)}
+.sec-ico{flex:0 0 54px;height:54px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;color:#fff}
+.sec-ico.blue{background:linear-gradient(135deg,#2563EB,#6FA8FF)}
+.sec-ico.orange{background:linear-gradient(135deg,#EA580C,#FB923C)}
+.sec-ico.red{background:linear-gradient(135deg,#DC2626,#F87171)}
+.sec-body{flex:1;min-width:0}
+.sec-name{font-size:17px;font-weight:700;display:flex;align-items:center;gap:8px}
+.sec-desc{font-size:12.5px;color:var(--c-text2);margin-top:2px}
+.sec-cnt{flex:0 0 auto;text-align:right}
+.sec-cnt b{font-size:26px;font-weight:800;color:var(--c-primary);line-height:1.1}
+.sec-cnt.blue b{color:var(--c-primary)}
+.sec-cnt.orange b{color:#EA580C}
+.sec-cnt.red b{color:var(--c-wrong)}
+.sec-cnt span{display:block;font-size:11px;color:var(--c-text2)}
+.home-tip{margin-top:16px;padding:11px 14px;border-radius:12px;background:#FFFBEB;border:1px dashed #FDE68A;color:var(--c-warn);font-size:12.5px;line-height:1.6}
+
+/* ── 模式选择页 ── */
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--c-border)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;padding-bottom:12px}
+.tb-left{display:flex;align-items:center;gap:10px;min-width:0}
+.tb-back{border:1.5px solid var(--c-border);background:#fff;border-radius:10px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--c-text2);cursor:pointer;transition:.15s;white-space:nowrap}
+.tb-back:hover{border-color:var(--c-primary);color:var(--c-primary)}
+.tb-title{font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-mode{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--c-warn);color:#fff;white-space:nowrap}
+.tb-mode.practice{background:var(--c-primary)}
+.tb-menu{border:none;background:transparent;font-size:18px;cursor:pointer;color:var(--c-text2);padding:4px 8px}
+.page-h{margin:20px 0 14px}
+.page-h h2{font-size:18px;font-weight:700}
+.page-h p{font-size:13px;color:var(--c-text2);margin-top:3px}
+.mode-list{display:flex;flex-direction:column;gap:14px}
+.mode-card{display:flex;gap:16px;align-items:center;background:var(--c-card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 20px;cursor:pointer;transition:.18s;border:1.5px solid transparent}
+.mode-card:hover{transform:translateY(-3px);box-shadow:0 8px 26px rgba(37,99,235,.16);border-color:#BFDBFE}
+.mode-card.recite:hover{box-shadow:0 8px 26px rgba(217,119,6,.18);border-color:#FDE68A}
+.mode-ico{flex:0 0 52px;height:52px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff}
+.mode-ico.practice{background:linear-gradient(135deg,#2563EB,#6FA8FF)}
+.mode-ico.recite{background:linear-gradient(135deg,#D97706,#FBBF24)}
+.mode-name{font-size:17px;font-weight:700}
+.mode-desc{font-size:12.5px;color:var(--c-text2);margin-top:2px;line-height:1.55}
+.mode-go{margin-left:auto;font-size:20px;color:var(--c-text2)}
+
+/* ── 刷题页 ── */
+.prog-wrap{height:8px;background:var(--c-border);border-radius:99px;overflow:hidden;margin:14px 0 0}
+.prog{height:100%;background:linear-gradient(90deg,var(--c-primary),#6FA8FF);border-radius:99px;transition:width .3s}
+.card{background:var(--c-card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 18px 16px;margin-top:14px;animation:fadeIn .25s ease}
+.q-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--c-primary-light);color:var(--c-primary)}
+.badge.green{background:var(--c-correct-bg);color:var(--c-correct)}
+.badge.red{background:var(--c-wrong-bg);color:var(--c-wrong)}
+.badge.gray{background:var(--c-bg);color:var(--c-text2)}
+.q-no{font-size:12px;color:var(--c-text2)}
+.q-text{font-size:15.5px;font-weight:500;white-space:pre-wrap}
+.opts{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.opt{display:flex;align-items:center;gap:10px;padding:12px 13px;border:1.5px solid var(--c-border);border-radius:11px;background:#FAFBFC;cursor:pointer;font-size:14.5px;transition:.13s;user-select:none}
+.opt:hover{border-color:#93C5FD;background:var(--c-primary-light)}
+.opt .letter{flex:0 0 26px;height:26px;border-radius:50%;background:var(--c-bg);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--c-text2)}
+.opt.picked{border-color:var(--c-primary);background:var(--c-primary-light)}
+.opt.picked .letter{background:var(--c-primary);color:#fff}
+.opt.picked.locked{pointer-events:none}
+/* 背题模式选中态（绿色） */
+.opt.recite-picked{border-color:var(--c-correct);background:var(--c-correct-bg)}
+.opt.recite-picked .letter{background:var(--c-correct);color:#fff}
+.opt.right{border-color:var(--c-correct);background:var(--c-correct-bg)}
+.opt.right .letter{background:var(--c-correct);color:#fff}
+.opt.wrongpick{border-color:var(--c-wrong);background:var(--c-wrong-bg)}
+.opt.wrongpick .letter{background:var(--c-wrong);color:#fff}
+.opt.locked{pointer-events:none}
+.btn{border:none;border-radius:11px;padding:11px 18px;font-size:14px;font-weight:600;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--c-primary);color:#fff;box-shadow:0 2px 10px rgba(37,99,235,.35)}
+.btn-primary:hover{background:var(--c-primary-dark)}
+.btn-ghost{background:#fff;color:var(--c-text2);border:1.5px solid var(--c-border)}
+.btn-ghost:hover{border-color:#9CA3AF;color:var(--c-text)}
+.btn-ghost:disabled{opacity:.4;cursor:default}
+.btn-green{background:var(--c-correct);color:#fff}
+.btn-green:hover{filter:brightness(1.06)}
+.action-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.action-row .btn{flex:1;min-width:130px}
+.btn-ghost.next-hl{border-color:var(--c-primary);color:var(--c-primary);background:var(--c-primary-light)}
+.feedback{margin-top:14px;padding:12px 14px;border-radius:11px;font-size:13.5px;animation:fadeIn .2s}
+.feedback.ok{background:var(--c-correct-bg);color:var(--c-correct);border:1px solid #BBF7D0}
+.feedback.no{background:var(--c-wrong-bg);color:var(--c-wrong);border:1px solid #FECACA}
+.feedback.info{background:var(--c-primary-light);border:1px solid #BFDBFE;color:#1E40AF}
+.feedback b{font-size:14px}
+.feedback .exp{display:block;margin-top:4px;color:var(--c-text);font-size:13px;line-height:1.6}
+.ans-panel{margin-top:14px;border-radius:11px;border:1px solid var(--c-border);overflow:hidden;animation:fadeIn .2s}
+.ans-panel .ans-hd{background:var(--c-bg);padding:8px 13px;font-size:12px;font-weight:700;color:var(--c-text2)}
+.ans-panel .ans-bd{padding:12px 13px;font-size:14px;white-space:pre-wrap}
+.recite-banner{margin-top:12px;padding:9px 12px;border-radius:10px;background:#FFFBEB;border:1px dashed #FDE68A;color:var(--c-warn);font-size:12px}
+.nav-row{display:flex;gap:10px;margin-top:14px}
+.nav-row .btn{flex:1}
+.pos-ind{text-align:center;font-size:12px;color:var(--c-text2);margin-top:10px}
+.empty{text-align:center;padding:46px 20px;color:var(--c-text2)}
+.empty .big{font-size:44px;margin-bottom:10px}
+.empty p{font-size:14px}
+#toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(20px);background:#111827;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:99;max-width:86vw;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── 弹窗 ── */
+.overlay{position:fixed;inset:0;background:rgba(17,24,39,.45);z-index:100;display:none;align-items:center;justify-content:center;padding:18px}
+.overlay.show{display:flex}
+.modal{background:#fff;border-radius:18px;max-width:520px;width:100%;max-height:82vh;overflow:auto;padding:22px;animation:fadeIn .2s}
+.modal h2{font-size:17px;margin-bottom:12px;color:var(--c-primary)}
+.modal h3{font-size:14px;margin:14px 0 6px}
+.modal p,.modal li{font-size:13.5px;color:var(--c-text)}
+.modal ol,.modal ul{padding-left:20px}
+.modal li{margin-bottom:5px}
+.modal .code{background:var(--c-bg);border-radius:8px;padding:2px 8px;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+.hist-item{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:7px 4px;border-bottom:1px dashed var(--c-border)}
+.hist-item .r-ok{color:var(--c-correct);font-weight:700}
+.hist-item .r-no{color:var(--c-wrong);font-weight:700}
+.modal .close-row{text-align:center;margin-top:16px}
+kbd{background:var(--c-bg);border:1px solid var(--c-border);border-bottom-width:2px;border-radius:5px;padding:1px 6px;font-size:11px;font-family:inherit}
+
+@media (max-width:520px){
+  .stats{gap:5px}
+  .stat b{font-size:15px}.stat span{font-size:10px}
+  h1{font-size:17px}
+  .card{padding:15px 14px 13px}
+  .q-text{font-size:14.5px}
+  .hd-chip{font-size:11px;padding:5px 10px}
+  .sec-ico{flex:0 0 46px;height:46px;font-size:22px}
+  .sec-cnt b{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ 页面1：首页（三板块） ═══════════ -->
+<div class="page active" id="pageHome">
+<header>
+  <div class="wrap">
+    <div class="hd-row">
+      <div>
+        <h1><span class="logo">🧪</span>有机化学考前刷题</h1>
+        <div class="hd-sub">陆涛《有机化学》第 9 版配套 · 117 题（核心模拟卷 + 200题库精选）</div>
+      </div>
+      <div class="hd-btns">
+        <button class="hd-chip primary" id="btnInstall">⬇️ 安装应用</button>
+        <button class="hd-chip" id="btnMenu">☰ 菜单</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="stTotal">117</b><span>总题数</span></div>
+      <div class="stat"><b id="stDone">0</b><span>已做</span></div>
+      <div class="stat"><b id="stUndo">117</b><span>未做</span></div>
+      <div class="stat"><b id="stWrong">30</b><span>错题</span></div>
+      <div class="stat"><b id="stRate">--</b><span>正确率</span></div>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+  <div class="sec-list">
+    <div class="sec-card" data-sec="all">
+      <div class="sec-ico blue">📚</div>
+      <div class="sec-body">
+        <div class="sec-name">全部题目</div>
+        <div class="sec-desc">117 题全量 · 内含「练习模式」与「背题模式」</div>
+      </div>
+      <div class="sec-cnt blue"><b id="cAll">117</b><span>题</span></div>
+    </div>
+    <div class="sec-card" data-sec="undo">
+      <div class="sec-ico orange">📝</div>
+      <div class="sec-body">
+        <div class="sec-name">未做</div>
+        <div class="sec-desc">还没有做过的题目，从这里继续推进</div>
+      </div>
+      <div class="sec-cnt orange"><b id="cUndo">117</b><span>题</span></div>
+    </div>
+    <div class="sec-card" data-sec="wrong">
+      <div class="sec-ico red">❌</div>
+      <div class="sec-body">
+        <div class="sec-name">错题</div>
+        <div class="sec-desc">做错的客观题 + 尚未标记「已会」的填空/简答/主观题</div>
+      </div>
+      <div class="sec-cnt red"><b id="cWrong">30</b><span>题</span></div>
+    </div>
+  </div>
+  <div class="home-tip">💡 填空题、简答题等主观题一开始就在「错题」里——查看参考答案后，点<b>「标记已会」</b>即可将其移出错题本。多选题需全部选对才得分。背题模式只看不记，完全不影响未做/错题。</div>
+</div>
+</div>
+
+<!-- ═══════════ 页面2：全部 → 模式选择 ═══════════ -->
+<div class="page" id="pageMode">
+<div class="topbar"><div class="wrap">
+  <div class="tb-left"><button class="tb-back" id="backHome1">← 返回</button><div class="tb-title">全部题目 · 选择模式</div></div>
+  <button class="tb-menu" id="btnMenu2">☰</button>
+</div></div>
+<div class="wrap">
+  <div class="page-h"><h2>进入「全部」前，先选个模式</h2><p>两种模式互不干扰：练习会记录，背题零写入。</p></div>
+  <div class="mode-list">
+    <div class="mode-card" data-mode="practice">
+      <div class="mode-ico practice">✍️</div>
+      <div class="sec-body">
+        <div class="mode-name">练习模式</div>
+        <div class="mode-desc">答题自动判分，计入统计与错题本；自动定位到上次做到的题</div>
+      </div>
+      <div class="mode-go">→</div>
+    </div>
+    <div class="mode-card recite" data-mode="recite">
+      <div class="mode-ico recite">📖</div>
+      <div class="sec-body">
+        <div class="mode-name">背题模式</div>
+        <div class="mode-desc">直接展示答案与解析，不记录任何状态，不影响未做/错题</div>
+      </div>
+      <div class="mode-go">→</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ 页面3：刷题页 ═══════════ -->
+<div class="page" id="pageQuiz">
+<div class="topbar"><div class="wrap">
+  <div class="tb-left">
+    <button class="tb-back" id="btnBackQuiz">← 返回</button>
+    <div class="tb-title" id="quizTitle">全部</div>
+    <span class="tb-mode" id="quizModeBadge" style="display:none">练习模式</span>
+  </div>
+  <button class="tb-menu" id="btnMenu3">☰</button>
+</div></div>
+<div class="wrap">
+  <div class="prog-wrap"><div class="prog" id="prog" style="width:0%"></div></div>
+  <div id="cardBox"></div>
+  <div class="pos-ind" id="posInd"></div>
+</div>
+</div>
+
+<div id="toast"></div>
+
+<div class="overlay" id="menuOverlay">
+  <div class="modal">
+    <h2>☰ 菜单</h2>
+    <h3>⏱️ 做题记录（最近 30 条）</h3>
+    <div id="histBox"></div>
+    <h3>⚙️ 数据管理</h3>
+    <p style="margin-bottom:10px">所有进度、错题、历史记录都保存在<b>本地浏览器</b>（localStorage），换浏览器或清除缓存会丢失。清除浏览器站点数据前，请先备份。</p>
+    <div class="action-row">
+      <button class="btn btn-ghost" id="btnExport">📤 导出进度</button>
+      <button class="btn btn-ghost" id="btnImport">📥 导入进度</button>
+      <button class="btn btn-ghost" id="btnReset" style="color:var(--c-wrong)">🗑️ 清空记录</button>
+    </div>
+    <h3>⌨️ 键盘快捷键（电脑端）</h3>
+    <ul>
+      <li><kbd>←</kbd> <kbd>→</kbd> 上一题 / 下一题</li>
+      <li>选择题：<kbd>A</kbd>~<kbd>D</kbd>；判断/对错题：<kbd>A</kbd>=对，<kbd>B</kbd>=错（或 <kbd>1</kbd>/<kbd>2</kbd>）</li>
+      <li><kbd>Enter</kbd> 下一题</li>
+    </ul>
+    <div class="close-row"><button class="btn btn-primary" id="btnCloseMenu">关闭</button></div>
+  </div>
+</div>
+
+<div class="overlay" id="helpOverlay">
+  <div class="modal">
+    <h2>⬇️ 安装为浏览器应用</h2>
+    <p id="installHelp"></p>
+    <ol>
+      <li>用 <b>Chrome / Edge</b> 打开本页面（需要通过网址访问，本地双击打开的 file:// 页面浏览器不允许安装）；</li>
+      <li>点击右上角 <span class="code">⬇️ 安装应用</span> 按钮，或浏览器地址栏右侧的安装图标；</li>
+      <li>确认后桌面/开始菜单会出现"有机化学考前刷题"独立图标，打开后是全屏无地址栏的独立窗口；</li>
+      <li>手机 Chrome：菜单 →「添加到主屏幕」，效果相同。</li>
+    </ol>
+    <p style="margin-top:10px;color:var(--c-text2);font-size:12.5px">提示：直接双击打开本 HTML 文件也能正常刷题（进度照常保存），只是无法"安装成应用"。</p>
+    <div class="close-row"><button class="btn btn-primary" id="btnCloseHelp">知道了</button></div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════ 题库数据（来自《有机化学考前冲刺模拟卷》） ═══════════════ */
+const QS = [
+/* 一、单项选择 */
+{id:1, t:'choice', sec:'单选', pt:2, q:'下列化合物中，沸点最高的是（　）', opts:['正丁烷','正丁醇','乙醚','丁醛'], a:1, exp:'正丁醇分子间可形成氢键，沸点显著高于其余三者。'},
+{id:2, t:'choice', sec:'单选', pt:2, q:'下列自由基中稳定性最强的是（　）', opts:['甲基自由基','伯碳自由基','仲碳自由基','叔碳自由基'], a:3, exp:'稳定性：叔＞仲＞伯＞甲基，烷基供电子效应使自由基稳定。'},
+{id:3, t:'choice', sec:'单选', pt:2, q:'苯环上发生亲电取代反应时，使苯环活性最高的取代基是（　）', opts:['—NO₂','—CH₃','—OH','—Cl'], a:2, exp:'—OH 为强活化邻对位基；—CH₃ 弱活化；—Cl 邻对位定位但钝化；—NO₂ 间位钝化。'},
+{id:4, t:'choice', sec:'单选', pt:2, q:'苯环上发生亲电取代反应时，属于邻、对位定位基但使苯环钝化的基团是（　）', opts:['—CH₃','—Cl','—NO₂','—COOH'], a:1, exp:'卤素是独特的"定位邻对、活性钝化"基团，最易考。—NO₂、—COOH 为间位钝化基。'},
+{id:5, t:'choice', sec:'单选', pt:2, q:'不对称烯烃与 HBr 在过氧化物条件下发生加成，遵循的规则是（　）', opts:['马氏规则','反马氏规则','扎伊采夫规则','休克尔规则'], a:1, exp:'过氧化物效应（HBr 特有）经自由基机理，氢加到含氢少的碳上，反马氏。'},
+{id:6, t:'choice', sec:'单选', pt:2, q:'下列化合物中，能发生碘仿反应的是（　）', opts:['乙醇','甲醛','丙醛','3-戊酮'], a:0, exp:'碘仿反应要求含 CH₃CO—（甲基酮）或可被氧化为乙醛/甲基酮的醇（乙醇）。甲醛无甲基，丙醛非甲基酮，3-戊酮为乙基酮。'},
+{id:7, t:'choice', sec:'单选', pt:2, q:'鉴别乙醛和丙酮可选用的试剂是（　）', opts:['斐林试剂','饱和碳酸氢钠溶液','溴水','三氯化铁溶液'], a:0, exp:'斐林试剂与脂肪醛反应生成砖红色 Cu₂O 沉淀，丙酮不反应。'},
+{id:8, t:'choice', sec:'单选', pt:2, q:'下列羧酸中酸性最强的是（　）', opts:['乙酸','氯乙酸','二氯乙酸','三氯乙酸'], a:3, exp:'氯的吸电子诱导效应随数目增加而增强，三氯乙酸 pKa 最小。'},
+{id:9, t:'choice', sec:'单选', pt:2, q:'SN2 反应的立体化学特征是（　）', opts:['构型保持','构型翻转','外消旋化','无立体变化'], a:1, exp:'SN2 一步完成，亲核试剂背面进攻，构型翻转（Walden 转化）。'},
+{id:10, t:'choice', sec:'单选', pt:2, q:'下列化合物中，可形成分子内氢键的是（　）', opts:['3-甲基苯甲酸','2-羟基苯甲醛','4-甲基苯酚','4-甲氧基苯甲酸'], a:1, exp:'2-羟基苯甲醛（水杨醛）中羟基与醛基相邻，可形成六元环分子内氢键。'},
+{id:11, t:'choice', sec:'单选', pt:2, q:'乙炔分子中碳原子的杂化类型为（　）', opts:['sp','sp²','sp³','不杂化'], a:0, exp:'乙炔为 sp 杂化，分子呈直线形。'},
+{id:12, t:'choice', sec:'单选', pt:2, q:'环己烷的优势构象是（　）', opts:['船式构象','椅式构象','扭船式构象','半椅式构象'], a:1, exp:'椅式构象中全部碳氢键处于交叉式，扭转张力最小。'},
+{id:13, t:'choice', sec:'单选', pt:2, q:'甲苯在光照条件下与氯气反应的主要产物是（　）', opts:['邻氯甲苯','对氯甲苯','苄基氯','间氯甲苯'], a:2, exp:'光照下经自由基机理进攻侧链 α-H 生成苄基氯；无光照（FeCl₃ 催化）才是苯环取代。'},
+{id:14, t:'choice', sec:'单选', pt:2, q:'下列物质中属于叔胺的是（　）', opts:['甲胺','二甲胺','三甲胺','苯胺'], a:2, exp:'叔胺为氮上连三个烃基；三甲胺 N 上连三个甲基。'},
+{id:15, t:'choice', sec:'单选', pt:2, q:'酯的水解反应属于（　）', opts:['亲电取代','亲核取代','亲电加成','亲核加成'], a:1, exp:'酯水解是酰碳上的亲核取代（加成—消除机理）。'},
+{id:16, t:'choice', sec:'单选', pt:2, q:'下列烯烃中，氢化热最低、稳定性最高的是（　）', opts:['乙烯','丙烯','2-甲基-2-丁烯','1-丁烯'], a:2, exp:'双键碳上烷基越多，烯烃越稳定，氢化热越低。'},
+{id:17, t:'choice', sec:'单选', pt:2, q:'可用于鉴别苯酚和醇的试剂是（　）', opts:['金属钠','三氯化铁溶液','溴水','稀盐酸'], a:1, exp:'三氯化铁与苯酚显紫色，与醇无显色，最便捷。'},
+{id:18, t:'choice', sec:'单选', pt:2, q:'下列化合物中最容易发生脱羧反应的是（　）', opts:['乙酸','草酸','丙酸','丁酸'], a:1, exp:'草酸为二元酸，受热易脱羧生成甲酸，继续分解为 CO₂ 和水。'},
+{id:19, t:'choice', sec:'单选', pt:2, q:'格氏试剂（RMgX）不能稳定存在的溶剂是（　）', opts:['无水乙醚','无水四氢呋喃','乙醇','无水苯'], a:2, exp:'格氏试剂遇活泼氢（—OH 等）即被破坏，制备与使用必须严格无水。'},
+{id:20, t:'choice', sec:'单选', pt:2, q:'下列化合物中，不具有芳香性的是（　）', opts:['苯','萘','环戊二烯负离子','环辛四烯'], a:3, exp:'休克尔规则：平面环状共轭且 π 电子数=4n+2。环辛四烯 8 个 π 电子（4n）且非平面，无芳香性；环戊二烯负离子 6 个 π 电子，有芳香性。'},
+{id:21, t:'choice', sec:'单选', pt:2, q:'能与亚硝酸在低温下反应生成重氮盐的化合物是（　）', opts:['甲胺','二甲胺','苯胺','环己胺'], a:2, exp:'重氮盐由伯芳胺（ArNH₂）在 0～5℃ 与亚硝酸/盐酸制得；脂肪族伯胺与亚硝酸放出氮气。'},
+{id:22, t:'choice', sec:'单选', pt:2, q:'下列化合物中存在顺反异构的是（　）', opts:['2-甲基-2-丁烯','1-丁烯','2-丁烯','2-甲基-1-丁烯'], a:2, exp:'顺反异构要求双键两端各连两个不同基团，2-丁烯满足。'},
+{id:23, t:'choice', sec:'单选', pt:2, q:'下列化合物中无旋光性的是（　）', opts:['乳酸','酒石酸（内消旋体）','2-氯丁烷','丙氨酸'], a:1, exp:'内消旋体含对称面，无旋光性；其余各含一个手性碳，有旋光性。'},
+{id:24, t:'choice', sec:'单选', pt:2, q:'可用于鉴别伯胺、仲胺、叔胺的试剂是（　）', opts:['卢卡斯试剂','斐林试剂','希夫试剂','苯磺酰氯'], a:3, exp:'兴斯堡反应：伯胺的磺酰胺溶于碱，仲胺的磺酰胺不溶于碱，叔胺不反应。'},
+{id:25, t:'choice', sec:'单选', pt:2, q:'Williamson 合成法是合成（　）的重要方法', opts:['卤代烃','高级炔','混合醚','伯醇'], a:2, exp:'卤代烃+醇钠制混合醚；注意取位阻小的卤代烃作烷基化剂，避免消除副反应。'},
+/* 二、判断（对错选择题：A=正确 B=错误） */
+{id:26, t:'judge', sec:'判断', pt:1, q:'所有的醛都能发生斐林反应。（选对或错）', a:false, exp:'芳香醛（如苯甲醛）不与斐林试剂反应，只有脂肪族醛才有正反应。'},
+{id:27, t:'judge', sec:'判断', pt:1, q:'格氏试剂能与二氧化碳反应，水解后生成羧酸。（选对或错）', a:true, exp:'格氏试剂与 CO₂ 亲核加成，水解后羧基比原来烃基多一个碳，是增碳合成羧酸的重要方法。'},
+{id:28, t:'judge', sec:'判断', pt:1, q:'手性分子一定含有手性碳原子。（选对或错）', a:false, exp:'存在不含手性碳的手性分子，如丙二烯型化合物、单键旋转受阻的取代联苯。'},
+{id:29, t:'judge', sec:'判断', pt:1, q:'苯不能发生任何加成反应。（选对或错）', a:false, exp:'苯可以催化加氢生成环己烷、光照加氯生成六氯环己烷。'},
+{id:30, t:'judge', sec:'判断', pt:1, q:'酯的水解反应属于亲电取代反应。（选对或错）', a:false, exp:'酯水解是酰碳上的亲核取代（加成—消除）反应。'},
+/* 三、填空 */
+{id:31, t:'fill', sec:'填空', pt:2, q:'烷烃的典型反应为＿＿＿反应，烯烃的典型反应为＿＿＿反应。', ans:'自由基（游离基）取代；亲电加成', exp:'烷烃典型反应是自由基取代（如光照卤代），烯烃典型反应是亲电加成。'},
+{id:32, t:'fill', sec:'填空', pt:1, q:'手性分子的判据是：分子＿＿＿对称面和对称中心。（填"含"或"不含"）', ans:'不含', exp:'手性分子既不含对称面，也不含对称中心。'},
+{id:33, t:'fill', sec:'填空', pt:1, q:'醛酮与羟胺反应生成的产物是＿＿＿。', ans:'肟', exp:'醛酮与羟胺（NH₂OH）缩合生成肟（R₂C=N—OH）。'},
+{id:34, t:'fill', sec:'填空', pt:1, q:'糖类化合物中，能发生银镜反应的糖称为＿＿＿。', ans:'还原糖', exp:'能发生银镜反应（有还原性）的糖称为还原糖。'},
+{id:35, t:'fill', sec:'填空', pt:2, q:'格氏试剂与甲醛反应可制备＿＿＿醇，与其他醛反应可制备＿＿＿醇。', ans:'伯；仲', exp:'格氏+甲醛→伯醇（增一个碳）；格氏+其他醛→仲醇；格氏+酮→叔醇。'},
+{id:36, t:'fill', sec:'填空', pt:2, q:'扎伊采夫规则：优先脱去含氢较＿＿＿的 β-碳原子上的氢，生成双键碳上取代基更＿＿＿的烯烃。', ans:'少；多', exp:'消除优先生成双键碳上取代基较多（更稳定）的烯烃。'},
+{id:37, t:'fill', sec:'填空', pt:1, q:'苯的硝化反应属于亲电取代反应，反应的活性中间体是＿＿＿。', ans:'σ-络合物（芳基正离子，又称 Wheland 中间体）', exp:'硝化活性中间体为 σ-络合物（Wheland 中间体）。'},
+/* 四、完成反应式 */
+{id:38, t:'text', sec:'反应式', pt:3, q:'完成反应式：CH₃CH=CH₂ + HBr → ？', ans:'CH₃CHBrCH₃（马氏规则：氢加到含氢较多的双键碳上）', exp:'丙烯与 HBr 亲电加成遵循马氏规则，得 2-溴丙烷。'},
+{id:39, t:'text', sec:'反应式', pt:3, q:'完成反应式：CH₃CH₂Br + NaOH（乙醇溶液，Δ）→ ？', ans:'CH₂=CH₂ + NaBr + H₂O', exp:'卤代烃在醇碱中加热发生消除（E2），得乙烯。'},
+{id:40, t:'text', sec:'反应式', pt:3, q:'完成反应式：C₆H₅CH₃ + KMnO₄/H⁺ → ？', ans:'C₆H₅COOH（苯甲酸）', exp:'侧链无论长短，只要含 α-H，氧化产物都是苯甲酸。'},
+{id:41, t:'text', sec:'反应式', pt:3, q:'完成反应式：CH₃CHO + Cu(OH)₂（Δ）→ ？', ans:'CH₃COOH + Cu₂O↓（砖红色沉淀）+ 2H₂O', exp:'斐林反应：脂肪醛被弱氧化剂氧化，生成砖红色 Cu₂O 沉淀。'},
+{id:42, t:'text', sec:'反应式', pt:3, q:'完成反应式：CH₃CH₂MgBr + HCHO，再经 H₃O⁺ 水解 → ？', ans:'CH₃CH₂CH₂OH（丙醇，伯醇）', exp:'格氏试剂与甲醛加成、水解得伯醇，增加一个碳。'},
+/* 五、鉴别 */
+{id:43, t:'text', sec:'鉴别', pt:2, q:'鉴别：乙醛、丙酮、苯甲醛三种无色液体。写出所用试剂并描述现象。', ans:'① 各取少量加新配斐林试剂、水浴加热：有砖红色沉淀（Cu₂O）的是乙醛；② 余下两种加碘的 NaOH 溶液（碘仿反应）：生成黄色沉淀（碘仿）的是丙酮，无明显现象的是苯甲醛。', exp:'斐林检出脂肪醛（乙醛）；碘仿检出甲基酮（丙酮）。'},
+{id:44, t:'text', sec:'鉴别', pt:2, q:'鉴别：乙醇、苯酚、乙酸三种无色液体。写出所用试剂并描述现象。', ans:'① 各取少量加三氯化铁溶液：显紫色的是苯酚；② 余下两种加碳酸氢钠溶液：有气泡（CO₂）的是乙酸，无现象的是乙醇。', exp:'FeCl₃ 检出酚；NaHCO₃ 检出比碳酸强的羧酸。'},
+{id:45, t:'text', sec:'鉴别', pt:2, q:'鉴别：伯胺、仲胺、叔胺三种脂肪族胺。写出所用试剂并描述现象。', ans:'兴斯堡反应：各取少量与苯磺酰氯及 NaOH 溶液反应——产物溶解于碱液的是伯胺；生成沉淀且沉淀不溶于碱的是仲胺；不反应、呈油状分层的是叔胺。', exp:'苯磺酰氯鉴别伯仲叔胺的经典方法。'},
+/* 六、结构推断 */
+{id:46, t:'text', sec:'推断', pt:8, q:'【结构推断】化合物 A 分子式 C₆H₁₂O，能与羟胺成肟，不银镜。A 催化加氢得醇 B；B 脱水、臭氧化、还原水解得两种液体 C 和 D。C 能银镜但不能碘仿；D 能碘仿但不能银镜。试推测 A、B、C、D 的结构。', ans:'A：2-甲基-2-戊酮 (CH₃)₂C(O)CH₂CH₂CH₃（成肟不银镜→酮）\nB：2-甲基-2-戊醇 (CH₃)₂C(OH)CH₂CH₂CH₃\nC：丙醛 CH₃CH₂CHO（银镜+，碘仿−→非甲基醛）\nD：丙酮 (CH₃)₂CO（碘仿+，银镜−→甲基酮）\n推理：C、D 羰基碳对接回推烯为 2-甲基-2-戊烯，即 B 扎氏脱水产物，碳数、现象全部吻合。', exp:'关键链条：成肟不银镜定酮 → 臭氧化断链"醛+甲基酮"回推烯烃 → 醇脱水取扎氏主产物。'},
+/* 七、合成 */
+{id:47, t:'text', sec:'合成', pt:3, q:'【合成】由 HOCH₂CH₂CH₂Br 合成 HOCH₂CH₂CH₂CH(OH)CH₃（写出路线及条件）。', ans:'目标引入"仲醇+甲基"片段，宜用格氏试剂与乙醛加成；因羟基会破坏格氏试剂，须先保护：\n① 二氢吡喃（DHP）/催化量酸 → 保护羟基成 THP 醚；\n② 无水乙醚中与 Mg 制格氏试剂；\n③ 与乙醛 CH₃CHO 加成后稀酸水解（同时脱保护）→ 目标产物。', exp:'含活泼氢的官能团制备格氏试剂前必须保护。'},
+{id:48, t:'text', sec:'合成', pt:3, q:'【合成】由甲苯合成对硝基苯甲酸（其他无机试剂任选）。', ans:'必须先硝化后氧化：\n① 甲苯 + 混酸（浓HNO₃/浓H₂SO₄）低温 → 主要得对硝基甲苯（—CH₃ 为邻对位定位基）；\n② 对硝基甲苯 + KMnO₄/H⁺ 氧化侧链 → 对硝基苯甲酸。\n若先氧化再硝化，—COOH 是间位钝化基，将错误地得到间硝基苯甲酸。', exp:'定位基性质决定官能团引入顺序，先"活化"后"钝化"。'},
+/* 八、简答题（来自200题题库 · 主观题全量收录，重复题已去重，缺答案的已补写） */
+{id:49, t:'text', sec:'简答', pt:3, q:'简述马氏规则的内容。', ans:'不对称烯烃与不对称试剂（如HX）加成时，氢原子主要加到含氢较多的双键碳原子上，而试剂的负电性部分（如X⁻）加到含氢较少的双键碳原子上。', exp:'本质是加成经更稳定的碳正离子中间体进行，正电荷落在更能稳定正电荷的碳上。'},
+{id:50, t:'text', sec:'简答', pt:3, q:'什么是共轭体系？共轭体系对化合物的性质有何影响？', ans:'共轭体系是分子中π键（或p轨道）与相邻π键（或p轨道）通过相邻原子相互平行重叠形成的离域体系，如1,3-丁二烯的π-π共轭、苯环的大π键、烯丙基碳正离子的p-π共轭。影响：①键长平均化；②分子内能降低、稳定性增高（氢化热低于孤立烯烃之和）；③电子云密度分布改变，使反应部位呈现规律性（共轭加成、苯环定位效应）。', exp:'离域是解释1,4-加成与苯环取代定位的关键。'},
+{id:51, t:'text', sec:'简答', pt:3, q:'什么是诱导效应？诱导效应对化合物的性质有何影响？', ans:'诱导效应是分子中原子或基团电负性不同，使σ键电子云沿键链向电负性较大一方偏移而产生的电子效应，用I表示（吸电子为-I，供电子为+I），沿碳链传递时迅速减弱（一般2~3个碳）。影响：①改变酸碱性——如卤代乙酸酸性随卤原子数目增多而增强；②影响碳正离子/碳负离子稳定性；③影响反应活性与区域选择性。', exp:'诱导效应是"静态"电子效应，是理解羧酸酸性递变的基础。'},
+{id:52, t:'text', sec:'简答', pt:3, q:'什么是共轭二烯烃的1,4-加成？', ans:'共轭二烯烃（如1,3-丁二烯）与试剂加成时，试剂的两部分分别加到共轭体系两端（C1和C4），双键转移到C2=C3，这种加成方式称为1,4-加成，与加到C1、C2上的1,2-加成并存。低温有利1,2-加成（动力学控制），较高温度有利1,4-加成（热力学控制，产物双键更稳定）。', exp:'1,2与1,4加成产物并存是共轭体系区别于孤立二烯烃的特征。'},
+{id:53, t:'text', sec:'简答', pt:3, q:'什么是立体异构体？立体异构体包括哪些类型？', ans:'立体异构体是分子式和构造式相同、原子在空间排列方式不同而产生的异构体。包括：①顺反异构（如顺-/反-2-丁烯）；②对映异构（旋光异构，互为镜像不能重合，如R/S-乳酸）；③非对映异构（含多个手性中心且不互为镜像）；④构象异构（单键旋转产生，如环己烷的椅式与船式）。', exp:'构型异构需断键才能互变，构象异构靠单键旋转即可互变。'},
+{id:54, t:'text', sec:'简答', pt:3, q:'什么是亲核取代反应？亲核取代反应包括哪些类型？', ans:'亲核取代反应（SN）是亲核试剂（带负电荷或含孤对电子）进攻底物中带部分正电荷的碳原子、取代离去基团的反应。主要类型：①SN2——一步完成，速率与底物和亲核试剂浓度都成正比，构型翻转，甲基和伯卤代烃、强亲核试剂有利；②SN1——经碳正离子分两步进行，速率只与底物浓度成正比，可外消旋化，叔卤代烃和极性溶剂有利。', exp:'SN1/SN2的竞争受底物结构、试剂亲核性和溶剂极性共同影响。'},
+{id:55, t:'text', sec:'简答', pt:3, q:'什么是诱导效应和共轭效应？它们对化合物的性质有何影响？', ans:'诱导效应（I效应）是σ键电子云因电负性差异沿键链偏移的电子效应，随碳链增长迅速减弱；共轭效应（C效应）是共轭体系中π电子（或p电子）离域、电子云密度平均化而产生的电子效应，可沿共轭链传递而不减弱。二者共同决定电子云分布，影响：①酸碱性（乙酸>乙醇的酸性）；②反应活性与定位（苯环取代基的活化/钝化）；③活性中间体稳定性与区域选择性。', exp:'诱导沿σ链衰减快，共轭沿π链全程传递，这是二者的核心区别。'},
+{id:56, t:'text', sec:'简答', pt:3, q:'什么是空间位阻？空间位阻对化合物的性质有何影响？', ans:'空间位阻是分子中体积较大的原子或基团相互靠近时产生的空间排斥作用。影响：①降低甚至阻止反应——如SN2中叔卤代烃因位阻大难以被背面进攻，倾向于SN1；②影响区域选择性——如大体积碱有利生成少取代的霍夫曼烯烃；③影响构象稳定性（环己烷直立键取代基因位阻能量较高）。', exp:'位阻是"立体效应"，与电子效应并列，共同决定反应速率与选择性。'},
+{id:57, t:'text', sec:'简答', pt:3, q:'简述什么是亲核试剂，并举例说明。', ans:'亲核试剂是具有孤对电子或负电荷、能够进攻带正电荷（或部分正电荷）的碳原子并形成新共价键的富电子试剂。例如：OH⁻、CN⁻、RO⁻、NH₃、H₂O、格氏试剂R-MgX等。一般带负电荷的亲核性强于相应的中性分子，如OH⁻＞H₂O。', exp:'亲核性关注"进攻碳的能力"，与碱性相关但并不等同。'},
+{id:58, t:'text', sec:'简答', pt:3, q:'简述什么是共轭效应，并举例说明其对有机化合物稳定性的影响。', ans:'共轭效应是共轭体系中π电子（或p电子）离域使电子云密度平均化而产生的电子效应。例：①1,3-丁二烯的π-π共轭使其氢化热低于两个孤立双键之和，分子更稳定；②烯丙基碳正离子因p-π共轭而比普通伯碳正离子稳定；③苯环大π键赋予苯特殊稳定性——不易加成、易取代。', exp:'判断稳定性时抓"离域程度越大越稳定"这条主线。'},
+{id:59, t:'text', sec:'简答', pt:3, q:'简述什么是立体化学，并说明其在有机化学中的重要性。', ans:'立体化学是研究分子的三维空间结构（构型与构象）及其对理化性质和反应行为影响的学科。重要性：①决定生物活性——药物分子往往只有特定构型有效（如沙利度胺一对对映体药效与毒性的差异）；②决定反应的区域选择性与立体选择性；③是理解旋光性、手性分离、酶催化专一性的基础。药学上，手性药物的构型直接关系疗效与用药安全。', exp:'"手性"是立体化学的核心概念，也是药学考题的高频切入点。'},
+{id:60, t:'text', sec:'简答', pt:3, q:'简述什么是哈沃斯透视式，并说明其在糖类化学中的应用。', ans:'哈沃斯透视式是把环状糖（吡喃糖、呋喃糖）的环画成垂直于纸面的平面多边形、用环平面上下的键表示取代基立体朝向的透视表示法。应用：直观表示环状半缩醛结构中苷羟基的α/β构型、各碳原子上羟基的空间排布，便于比较葡萄糖、果糖等单糖的环状结构、异头物差异及糖苷键的形成与命名。', exp:'从费歇尔投影式改写成哈沃斯式时，注意"右低左高"的方位规则。'},
+/* 九、题库精选 · 单选（40题，答案已逐题复核修正） */
+{id:61, t:'choice', sec:'单选', pt:2, q:'下列哪种反应是SN2反应的特征？', opts:['反应分两步进行','反应速率与底物浓度成正比，与亲核试剂浓度无关','反应速率与底物和亲核试剂的浓度都成正比','反应中发生构型保持'], a:2, exp:'SN2一步完成，速率与底物和亲核试剂浓度都成正比，且发生构型翻转（不是保持）。'},
+{id:62, t:'choice', sec:'单选', pt:2, q:'下列哪种反应是Diels-Alder反应的特征？', opts:['生成五元环状化合物','生成七元环状化合物','生成六元环状化合物','反应无立体选择性'], a:2, exp:'Diels-Alder反应是共轭双烯与亲双烯体的[4+2]环加成，特征是生成六元环且高度立体选择性。'},
+{id:63, t:'choice', sec:'单选', pt:2, q:'下列哪种反应是霍夫曼降解反应的特征？', opts:['生成多一个碳原子的胺','生成少一个碳原子的胺','生成相同碳原子的胺','不改变碳原子数'], a:1, exp:'酰胺在次卤酸盐和碱作用下降解，脱去羰基生成少一个碳的伯胺。'},
+{id:64, t:'choice', sec:'单选', pt:2, q:'下列哪种化合物能发生坎尼扎罗反应？', opts:['乙醛','丙醛','苯甲醛','丁醛'], a:2, exp:'坎尼扎罗（歧化）反应要求醛无α-氢；苯甲醛无α-氢，浓碱中生成苯甲醇和苯甲酸。'},
+{id:65, t:'choice', sec:'单选', pt:2, q:'下列哪种反应是克莱森重排反应的特征？', opts:['生成对位取代的酚','生成间位取代的酚','生成邻位取代的酚','不改变酚羟基的位置'], a:2, exp:'烯丙基芳基醚加热发生[3,3]-σ迁移，生成邻烯丙基酚（对位被占时才到对位）。'},
+{id:66, t:'choice', sec:'单选', pt:2, q:'下列哪种反应是傅-克烷基化反应的特征？', opts:['芳香环上的氢原子被烷基取代','芳香环上的氢原子被酰基取代','生成环状化合物','不改变芳香环的结构'], a:0, exp:'傅-克烷基化：芳烃+卤代烃在AlCl₃催化下，苯环氢被烷基取代；被酰基取代的是傅-克酰基化。'},
+{id:67, t:'choice', sec:'单选', pt:2, q:'下列哪种化合物能发生迈克尔加成反应？', opts:['乙酸乙酯','丙烯酸乙酯','乙酸丙酯','丙酸乙酯'], a:1, exp:'迈克尔加成的对象是α,β-不饱和羰基化合物；丙烯酸乙酯含该结构，可发生1,4-亲核加成。'},
+{id:68, t:'choice', sec:'单选', pt:2, q:'下列哪种反应是沃尔夫-凯歇尔-黄鸣龙还原反应的特征？', opts:['羰基被氧化为羧酸','羰基被还原为醇','羰基被还原为亚甲基','不改变羰基的结构'], a:2, exp:'醛酮与肼在强碱（KOH）和二甘醇中加热，羰基被还原为亚甲基（黄鸣龙改良的Wolff-Kishner还原）。'},
+{id:69, t:'choice', sec:'单选', pt:2, q:'下列哪种化合物能发生瑞穆尔-蒂曼反应？', opts:['苯','苯酚','苯甲醇','苯甲醛'], a:1, exp:'瑞穆尔-蒂曼反应：酚类在NaOH中与氯仿反应，主要生成邻羟基苯甲醛（水杨醛）。'},
+{id:70, t:'choice', sec:'单选', pt:2, q:'下列哪个反应是霍夫曼降解反应？', opts:['酰胺转化为羧酸','酰胺转化为伯胺','酯转化为醇','酯转化为羧酸'], a:1, exp:'霍夫曼降解：酰胺+次卤酸钠/碱 → 少一个碳的伯胺，是制备伯胺和缩短碳链的经典方法。'},
+{id:71, t:'choice', sec:'单选', pt:2, q:'下列哪个化合物可以发生贝克曼重排反应？', opts:['醛肟','酮肟','羟胺','肼'], a:1, exp:'贝克曼重排：酮肟在酸催化下重排为酰胺（如环己酮肟→己内酰胺，工业制尼龙-6）。'},
+{id:72, t:'choice', sec:'单选', pt:2, q:'下列哪个是构象异构体？', opts:['正丁烷和异丁烷','顺-2-丁烯和反-2-丁烯','正丁烷绕C-C键旋转产生的不同空间排列','1-丁烯和2-丁烯'], a:2, exp:'构象异构由单键旋转产生，不需断键即可互变；正丁烷的对位交叉与邻位交叉是典型构象异构。'},
+{id:73, t:'choice', sec:'单选', pt:2, q:'下列哪个反应是科普重排反应？', opts:['1,3-二烯转化为1,4-二烯','1,5-二烯转化为新的1,5-二烯','烯烃转化为炔烃','炔烃转化为烯烃'], a:1, exp:'科普（Cope）重排是1,5-二烯在加热下的[3,3]-σ迁移重排，生成新的1,5-二烯。'},
+{id:74, t:'choice', sec:'单选', pt:2, q:'下列哪个反应是克莱森缩合反应？', opts:['两分子醛缩合生成α,β-不饱和醛','两分子酮缩合生成α,β-不饱和酮','两分子酯缩合生成β-酮酸酯','两分子羧酸缩合生成酸酐'], a:2, exp:'克莱森缩合：酯在醇钠作用下，一分子提供α-碳负离子进攻另一分子酯羰基，生成β-酮酸酯。'},
+{id:75, t:'choice', sec:'单选', pt:2, q:'下列哪个化合物可以发生羟醛缩合反应？', opts:['甲醇','乙醛','丙酮','乙醇'], a:1, exp:'羟醛缩合要求α-氢。乙醛是最典型代表（丙酮亦可发生，本题取最典型的醛）；甲醇无α-氢不能发生。'},
+{id:76, t:'choice', sec:'单选', pt:2, q:'下列哪个反应是曼尼希反应？', opts:['含有活泼氢的化合物与甲醛和胺缩合生成β-氨基羰基化合物','醛与醇缩合生成半缩醛','酮与醇缩合生成半缩酮','羧酸与醇酯化生成酯'], a:0, exp:'曼尼希（Mannich）反应：活泼氢化合物+甲醛+二级胺（或氨）→ β-氨基羰基化合物。'},
+{id:77, t:'choice', sec:'单选', pt:2, q:'下列哪个化合物可以发生维蒂希反应？', opts:['醇','醛','羧酸','酯'], a:1, exp:'维蒂希（Wittig）反应：醛或酮与磷叶立德反应生成烯烃（本组选项中醛符合条件）。'},
+{id:78, t:'choice', sec:'单选', pt:2, q:'下列哪个化合物可以发生霍夫曼消除反应？', opts:['伯胺','仲胺','叔胺','季铵碱'], a:3, exp:'霍夫曼消除：季铵碱受热消除生成烯烃（霍夫曼规则：主要生成双键上取代基较少的烯烃）。'},
+{id:79, t:'choice', sec:'单选', pt:2, q:'下列哪个是旋光异构体？', opts:['D-葡萄糖和D-果糖','D-甘油醛和L-甘油醛','正丁烷和异丁烷','顺-2-丁烯和反-2-丁烯'], a:1, exp:'D-甘油醛与L-甘油醛互为镜像、旋光方向相反，是对映体（旋光异构体）。'},
+{id:80, t:'choice', sec:'单选', pt:2, q:'下列哪个化合物具有手性？', opts:['2-氯丙烷','2-丁醇','乙醚','丙酸'], a:1, exp:'2-丁醇的C2连有—CH₃、—H、—OH、—C₂H₅四个不同基团，是手性碳；2-氯丙烷两个甲基相同，无手性。'},
+{id:81, t:'choice', sec:'单选', pt:2, q:'以下哪种试剂可用于鉴别伯醇、仲醇和叔醇？', opts:['溴水','卢卡斯试剂','高锰酸钾溶液','斐林试剂'], a:1, exp:'卢卡斯试剂（浓盐酸+无水ZnCl₂）：叔醇立即浑浊，仲醇数分钟变浑浊，伯醇常温不浑浊。'},
+{id:82, t:'choice', sec:'单选', pt:2, q:'下列哪种反应是醛和酮的共同特征反应？', opts:['碘仿反应','斐林反应','亲核加成反应','托伦斯反应'], a:2, exp:'醛和酮都含羰基，共同特征是亲核加成（如与格氏试剂、羟胺、2,4-二硝基苯肼）；碘仿/斐林/托伦为甲基酮或醛特有。'},
+{id:83, t:'choice', sec:'单选', pt:2, q:'下列哪种化合物属于杂环化合物？', opts:['苯','吡啶','乙烯','乙炔'], a:1, exp:'杂环化合物的环上含氮、氧、硫等杂原子；吡啶是六元含氮杂环（芳香性）。'},
+{id:84, t:'choice', sec:'单选', pt:2, q:'下列哪种试剂可用于检验羧基？', opts:['斐林试剂','托伦斯试剂','碳酸氢钠溶液','溴水'], a:2, exp:'羧酸酸性强于碳酸，与NaHCO₃反应放出CO₂气体，可用于检验羧基（酚不能）。'},
+{id:85, t:'choice', sec:'单选', pt:2, q:'下列哪种试剂可用于还原硝基化合物？', opts:['氢气','铁粉与盐酸','溴水','高锰酸钾溶液'], a:1, exp:'Fe/HCl（或Sn/HCl）提供新生氢，将硝基还原为氨基（如硝基苯→苯胺），是制备芳胺的经典方法。'},
+{id:86, t:'choice', sec:'单选', pt:2, q:'下列哪种试剂可用于检验酮基？', opts:['斐林试剂','托伦斯试剂','2,4-二硝基苯肼','溴水'], a:2, exp:'2,4-二硝基苯肼与醛酮羰基缩合生成黄色/橙色腙沉淀，是检验羰基的通用试剂（斐林/托伦只对醛显阳性）。'},
+{id:87, t:'choice', sec:'单选', pt:2, q:'下列哪种试剂可用于检验淀粉？', opts:['斐林试剂','托伦斯试剂','碘液','溴水'], a:2, exp:'碘遇淀粉显蓝色（包合络合物），是淀粉的特征检验方法。'},
+{id:88, t:'choice', sec:'单选', pt:2, q:'下列哪种试剂可用于检验蛋白质？', opts:['斐林试剂','托伦斯试剂','双缩脲试剂','溴水'], a:2, exp:'双缩脲试剂与蛋白质中的肽键（≥2个肽键）在碱性条件下显紫色（紫红色）。'},
+{id:89, t:'choice', sec:'单选', pt:2, q:'下列哪个反应是消除反应？', opts:['溴乙烷与氢氧化钠的醇溶液反应','乙醛与氢气的反应','苯与溴的反应','乙醇与乙酸的酯化反应'], a:0, exp:'卤代烃在氢氧化钠醇溶液中加热，脱去HX生成烯烃（消除）；NaOH水溶液中则是取代。'},
+{id:90, t:'choice', sec:'单选', pt:2, q:'下列哪个反应是Diels-Alder反应？', opts:['1,3-丁二烯与乙烯的反应','乙烯与溴的反应','苯与溴的反应','乙醇与乙酸的酯化反应'], a:0, exp:'1,3-丁二烯（双烯体）与乙烯（亲双烯体）[4+2]环加成生成环己烯，是Diels-Alder反应的原始实例。'},
+{id:91, t:'choice', sec:'单选', pt:2, q:'下列哪个化合物可以发生偶联反应？', opts:['重氮盐与苯酚的反应','乙醇与溴的反应','乙醛与氢气的反应','乙酸与乙醇的酯化反应'], a:0, exp:'重氮盐与酚类（弱碱性）或芳胺在低温下偶联生成偶氮化合物（偶氮染料的基础反应）。'},
+{id:92, t:'choice', sec:'单选', pt:2, q:'下列哪个化合物是甾体化合物？', opts:['胆固醇','乙醇','乙醛','乙酸'], a:0, exp:'甾体化合物具有环戊烷多氢菲母核；胆固醇、胆酸、甾体激素等均属此类（药学重点结构类型）。'},
+{id:93, t:'choice', sec:'单选', pt:2, q:'下列哪种方法可用于测定有机化合物的相对分子质量？', opts:['紫外光谱法','红外光谱法','核磁共振氢谱法','质谱法'], a:3, exp:'质谱（MS）测分子离子峰的质荷比，可确定相对分子质量；IR定官能团，NMR定氢环境，UV定共轭体系。'},
+{id:94, t:'choice', sec:'单选', pt:2, q:'下列哪种方法可用于分离苯和甲苯的混合物？', opts:['过滤','蒸馏','分馏','萃取'], a:2, exp:'苯（80.1℃）与甲苯（110.6℃）沸点不同且互溶，用分馏（精馏）分离最合适。'},
+{id:95, t:'choice', sec:'单选', pt:2, q:'下列哪种方法可用于测定有机化合物的官能团？', opts:['紫外光谱法','红外光谱法','核磁共振氢谱法','质谱法'], a:1, exp:'红外光谱（IR）的特征吸收峰对应特定化学键/官能团（如C=O约1700cm⁻¹、O-H约3300cm⁻¹），是官能团鉴定首选。'},
+{id:96, t:'choice', sec:'单选', pt:2, q:'下列哪个化合物属于环醚？', opts:['乙醚','丁醚','四氢呋喃','苯甲醚'], a:2, exp:'环醚是醚键处于环内的化合物；四氢呋喃（THF）是五元环醚，也是常用溶剂。'},
+{id:97, t:'choice', sec:'单选', pt:2, q:'下列化合物中，哪个属于内酯？', opts:['乙酸乙酯','丁酸乙酯','γ-丁内酯','苯甲酸甲酯'], a:2, exp:'内酯是羟基酸分子内酯化形成的环状酯；γ-丁内酯由4个碳和1个氧构成五元环。'},
+{id:98, t:'choice', sec:'单选', pt:2, q:'下列哪种试剂可用于鉴别葡萄糖和果糖？', opts:['斐林试剂','托伦试剂','溴水','卢卡斯试剂'], a:2, exp:'溴水氧化醛糖（葡萄糖褪色），果糖是酮糖且在溴水的弱酸性条件下不发生差向异构化，不褪色。注意：斐林/托伦试剂果糖也能变正（碱性中异构化），不能区分二者。'},
+{id:99, t:'choice', sec:'单选', pt:2, q:'下列哪种反应属于自由基取代反应？', opts:['溴乙烷与氢氧化钠水溶液的反应','乙烯与溴水的反应','甲烷与氯气在光照条件下的反应','乙醇的脱水反应'], a:2, exp:'光照下氯气均裂成氯自由基，经链引发—链传递—链终止取代甲烷的氢，是自由基取代的经典实例。'},
+{id:100, t:'choice', sec:'单选', pt:2, q:'下列哪种反应属于亲核取代反应？', opts:['溴乙烷与氢氧化钠水溶液的反应','乙烯与溴水的反应','苯与液溴在铁粉催化下的反应','乙醇的脱水反应'], a:0, exp:'NaOH水溶液中OH⁻（亲核试剂）进攻溴乙烷的α-碳取代Br⁻，生成乙醇，属亲核取代。'},
+/* 十、题库精选 · 多选（9题，多选判分：全部选对才得分） */
+{id:101, t:'multi', sec:'多选', pt:2, q:'下列哪些化合物可以发生消去反应生成烯烃？', opts:['1-溴丙烷','2-溴丙烷','新戊烷','环己烷'], a:[0,1], exp:'1-溴丙烷和2-溴丙烷在醇碱中均可脱去HBr生成丙烯；新戊烷无卤素离去基，环己烷不属此情境。'},
+{id:102, t:'multi', sec:'多选', pt:2, q:'下列哪些方法可用于制备醇？', opts:['烯烃水合','卤代烃水解','醛酮还原','格氏试剂与醛酮反应'], a:[0,1,2,3], exp:'四种均可：烯烃水合、卤代烃碱性水解（NaOH水溶液）、醛酮催化氢化/负氢还原、格氏试剂与醛酮加成后水解。（原题库答案漏了卤代烃水解，已修正）'},
+{id:103, t:'multi', sec:'多选', pt:2, q:'下列哪些试剂可用于鉴别醛和酮？', opts:['卢卡斯试剂','托伦试剂','斐林试剂','希夫试剂'], a:[1,2,3], exp:'托伦（银镜）、斐林（砖红色Cu₂O）、希夫（紫红色）均醛阳性、酮阴性；卢卡斯试剂用于鉴别伯仲叔醇。'},
+{id:104, t:'multi', sec:'多选', pt:2, q:'下列哪些方法可用于制备羧酸？', opts:['氧化醇','还原醛','水解腈','格氏试剂与二氧化碳反应'], a:[0,2,3], exp:'伯醇氧化、腈水解、格氏+CO₂后水解均可制羧酸；还原醛得到的是醇，不是羧酸。'},
+{id:105, t:'multi', sec:'多选', pt:2, q:'下列哪些方法可用于制备烯烃？', opts:['氧化醇','脱水醇','消去卤代烃','炔烃部分还原'], a:[1,2,3], exp:'醇脱水、卤代烃消去、炔烃部分氢化（Lindlar/P-2催化剂）均可制烯烃；氧化醇得到的是醛/酮或羧酸。'},
+{id:106, t:'multi', sec:'多选', pt:2, q:'下列哪些试剂可用于鉴别烯烃和炔烃？', opts:['高锰酸钾溶液','银氨溶液','氯化亚铜的氨溶液','溴水'], a:[1,2], exp:'末端炔烃与银氨溶液（白色炔银）、氯化亚铜氨溶液（红色炔亚铜）生成沉淀，烯烃不能；KMnO₄和溴水两者都褪色，无法区分。'},
+{id:107, t:'multi', sec:'多选', pt:2, q:'下列哪些方法可用于制备酰胺？', opts:['羧酸与氨反应','醇与氨反应','酯与氨反应','腈水解'], a:[0,2,3], exp:'羧酸先成铵盐再加热脱水、酯氨解、腈控制水解均可制酰胺；醇与氨不能直接生成酰胺。'},
+{id:108, t:'multi', sec:'多选', pt:2, q:'下列化合物中，哪些能发生碘仿反应？', opts:['苯甲醇','苯甲醛','乙醇','丙酮'], a:[2,3], exp:'丙酮是甲基酮；乙醇可被氧化成乙醛（碘仿+）；苯甲醇氧化成苯甲醛、苯甲醛均无CH₃CO—结构，不能发生。'},
+{id:109, t:'multi', sec:'多选', pt:2, q:'下列化合物中，哪些能发生康尼查罗反应？', opts:['乙醛','丙醛','甲醛','苯甲醛'], a:[2,3], exp:'康尼查罗（浓碱歧化）要求无α-氢：甲醛、苯甲醛符合；乙醛、丙醛有α-氢，发生羟醛缩合而非歧化。'},
+/* 十一、题库精选 · 判断（对错选择） */
+{id:110, t:'judge', sec:'判断', pt:1, q:'所有的醛都能发生斐林反应。（选对或错）', a:false, exp:'芳香醛（如苯甲醛）不与斐林试剂反应，只有脂肪族醛才有正反应。（原题库解析表述有误，已修正）'},
+{id:111, t:'judge', sec:'判断', pt:1, q:'格氏试剂能与二氧化碳反应生成羧酸。（选对或错）', a:true, exp:'格氏试剂与CO₂亲核加成，水解后比原烃基多一个碳，是增碳制羧酸的经典方法。'},
+{id:112, t:'judge', sec:'判断', pt:1, q:'所有酯都能发生水解反应。（选对或错）', a:true, exp:'酯在酸性或碱性条件下均可水解（碱性水解不可逆），生成羧酸（盐）和醇。'},
+{id:113, t:'judge', sec:'判断', pt:1, q:'所有氨基酸都具有旋光性。（选对或错）', a:false, exp:'甘氨酸的α-碳上连有两个氢原子，无手性碳，不具旋光性；其余常见氨基酸均有旋光性。'},
+{id:114, t:'judge', sec:'判断', pt:1, q:'所有糖都能发生费林反应。（选对或错）', a:false, exp:'只有还原糖（含游离苷羟基，如葡萄糖、果糖）能发生；蔗糖等非还原糖不能。'},
+{id:115, t:'judge', sec:'判断', pt:1, q:'所有酯都能发生克莱森缩合反应。（选对或错）', a:false, exp:'克莱森缩合要求酯含α-氢（形成烯醇负离子）；无α-氢的酯（如苯甲酸乙酯）只能作为亲电受体参与交叉缩合。'},
+{id:116, t:'judge', sec:'判断', pt:1, q:'所有氨基酸都是两性电解质。（选对或错）', a:true, exp:'氨基酸分子中既有碱性氨基又有酸性羧基，能与酸成盐也能与碱成盐，在等电点处呈电中性。'},
+{id:117, t:'judge', sec:'判断', pt:1, q:'所有糖都具有还原性。（选对或错）', a:false, exp:'只有含游离苷羟基（半缩醛结构）的还原糖有还原性；蔗糖、淀粉、纤维素等非还原糖没有。'}
+];
+const TOTAL = QS.length;
+const OBJ = q => q.t==='choice' || q.t==='judge' || q.t==='multi';   // 客观题（自动判分）
+const SUB = q => q.t==='fill' || q.t==='text';      // 填空/主观题（标记已会）
+const truthArrOf = q => q.t==='judge' ? [q.a?0:1] : (q.t==='multi' ? [...q.a].sort((x,y)=>x-y) : [q.a]);
+
+/* ═══════════════ 状态管理（localStorage，V2 结构） ═══════════════ */
+const KEY = 'ocExamPracticeV2';
+let S = { status:{}, mastered:{}, history:[], last:null };
+try{ const raw = localStorage.getItem(KEY); if(raw){ const p = JSON.parse(raw); S.status=p.status||{}; S.mastered=p.mastered||{}; S.history=p.history||[]; S.last=p.last||null; } }catch(e){}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+
+const isWrong = q => OBJ(q) ? S.status[q.id]==='wrong' : !S.mastered[q.id];
+const isUndo  = q => OBJ(q) ? !S.status[q.id]        : !S.mastered[q.id];
+function listFor(sec){
+  if(sec==='undo') return QS.filter(isUndo);
+  if(sec==='wrong') return QS.filter(isWrong);
+  return QS.slice();
+}
+
+/* ═══════════════ 视图状态 ═══════════════ */
+let cur = null;              // {sec:'all'|'undo'|'wrong', mode:'practice'|'recite', pos}
+let answeredThisView = false;
+
+/* ═══════════════ 工具 ═══════════════ */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const LETTERS = ['A','B','C','D','E','F'];
+function fmtTime(ts){ const d=new Date(ts); const p=n=>String(n).padStart(2,'0'); return (d.getMonth()+1)+'/'+d.getDate()+' '+p(d.getHours())+':'+p(d.getMinutes()); }
+let toastTimer=null;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2300); }
+function secName(s){ return s==='all'?'全部':s==='undo'?'未做':'错题'; }
+function modeName(m){ return m==='recite'?'背题模式':'练习模式'; }
+function showPage(id){ $$('.page').forEach(p=>p.classList.toggle('active', p.id===id)); window.scrollTo(0,0); }
+
+/* ═══════════════ 统计 ═══════════════ */
+function updateCounts(){
+  const doneObj = QS.filter(q=>OBJ(q)&&S.status[q.id]).length;
+  const mastered = QS.filter(q=>SUB(q)&&S.mastered[q.id]).length;
+  const done = doneObj + mastered;
+  const wrongCnt = QS.filter(isWrong).length;
+  const corrObj = QS.filter(q=>S.status[q.id]==='correct').length;
+  const rate = done ? Math.round((corrObj+mastered)/done*100)+'%' : '--';
+  $('#stDone').textContent = done;
+  $('#stUndo').textContent = TOTAL-done;
+  $('#stWrong').textContent = wrongCnt;
+  $('#stRate').textContent = rate;
+  $('#cAll').textContent = TOTAL;
+  $('#cUndo').textContent = TOTAL-done;
+  $('#cWrong').textContent = wrongCnt;
+}
+
+/* ═══════════════ 打开板块 ═══════════════ */
+function openSection(sec, mode){
+  cur = { sec:sec, mode:(sec==='all'&&mode==='recite')?'recite':'practice', pos:0 };
+  showPage('pageQuiz');
+  renderQuiz();
+}
+function goBack(){
+  if(cur && cur.sec==='all'){ showPage('pageMode'); }
+  else { showPage('pageHome'); }
+  updateCounts();
+}
+
+/* ═══════════════ 渲染刷题页 ═══════════════ */
+function statusBadges(q){
+  let h = '';
+  if(OBJ(q)){
+    const st = S.status[q.id];
+    h += st==='correct' ? '<span class="badge green">✓ 已掌握</span>' : st==='wrong' ? '<span class="badge red">✗ 错题中</span>' : '<span class="badge gray">未做</span>';
+  } else {
+    h += S.mastered[q.id] ? '<span class="badge green">✓ 已会</span>' : '<span class="badge gray">未做</span><span class="badge red">在错题本</span>';
+  }
+  return h;
+}
+function renderQuiz(){
+  if(!cur) return;
+  const list = listFor(cur.sec);
+  const recite = (cur.sec==='all' && cur.mode==='recite');
+  /* 顶栏 */
+  $('#quizTitle').textContent = secName(cur.sec)+' · '+list.length+' 题';
+  const badge = $('#quizModeBadge');
+  if(cur.sec==='all'){ badge.style.display=''; badge.textContent = recite?'📖 背题模式':'✍️ 练习模式'; badge.className = 'tb-mode '+(recite?'':'practice'); }
+  else badge.style.display='none';
+  $('#prog').style.width = list.length ? ((cur.pos+1)/list.length*100)+'%' : '0%';
+  const box = $('#cardBox');
+  if(!list.length){
+    const msg = cur.sec==='wrong' ? '🎉 错题本清空，全部消灭！<br>今晚的你已经战胜有机化学了' : '🎉 太强了，这个板块已经没有题目了！<br>回首页看看其他板块吧';
+    box.innerHTML = '<div class="card"><div class="empty"><div class="big">🏆</div><p>'+msg+'</p></div></div>';
+    $('#posInd').textContent = '';
+    return;
+  }
+  if(cur.pos>=list.length) cur.pos = list.length-1;
+  if(cur.pos<0) cur.pos = 0;
+  const q = list[cur.pos];
+  /* 记录浏览进度（仅交互板块；背题模式绝不写入） */
+  if(!recite){ S.last = { sec:cur.sec, mode:cur.mode, qid:q.id }; save(); }
+  answeredThisView = false;
+
+  let inner = '<div class="q-meta"><span class="badge">'+q.sec+' · '+q.pt+'分</span>'+statusBadges(q)+'<span class="q-no">第 '+q.id+' 题</span></div>';
+  inner += '<div class="q-text">'+esc(q.q)+'</div>';
+
+  if(recite){
+    /* ── 背题模式：直出答案，零写入 ── */
+    inner += '<div class="recite-banner">📖 背题模式：只看不记，不影响未做/错题</div>';
+    if(OBJ(q)){
+      const opts = q.t==='judge' ? ['正确','错误'] : q.opts;
+      const ta = truthArrOf(q);
+      inner += '<div class="opts">';
+      opts.forEach((o,i)=>{
+        inner += ta.includes(i)
+          ? '<div class="opt recite-picked"><span class="letter">'+LETTERS[i]+'</span><span>'+esc(o)+'</span></div>'
+          : '<div class="opt"><span class="letter">'+LETTERS[i]+'</span><span>'+esc(o)+'</span></div>';
+      });
+      inner += '</div>';
+    }
+    inner += '<div class="ans-panel"><div class="ans-hd">📖 参考答案</div><div class="ans-bd">'+esc(OBJ(q) ? (q.t==='judge' ? (q.a?'正确（对）':'错误（错）') : LETTERS[q.a]+'. '+q.opts[q.a]) : q.ans)+'</div></div>';
+    if(q.exp) inner += '<div class="feedback info"><b>💡 解析</b><span class="exp">'+esc(q.exp)+'</span></div>';
+  } else {
+    /* ── 交互模式（练习/未做/错题） ── */
+    if(OBJ(q)){
+      const opts = q.t==='judge' ? ['正确','错误'] : q.opts;
+      inner += '<div class="opts" id="optBox">';
+      opts.forEach((o,i)=>{ inner += '<div class="opt" data-i="'+i+'"><span class="letter">'+LETTERS[i]+'</span><span>'+esc(o)+'</span></div>'; });
+      inner += '</div>';
+      if(q.t==='multi') inner += '<div class="action-row"><button class="btn btn-primary" id="btnSubmit">☑️ 提交答案（多选：全部选对才得分）</button></div>';
+      inner += '<div id="fb"></div>';
+    } else {
+      /* 填空/主观题：查看参考答案 + 标记已会 */
+      inner += '<div class="action-row">'
+        +'<button class="btn btn-primary" id="btnPeek">👁 查看参考答案</button>'
+        +'<button class="btn btn-green" id="btnMaster">✅ 标记已会</button>'
+        +'</div><div id="fb"></div>';
+    }
+  }
+
+  inner += '<div class="nav-row">'
+    +'<button class="btn btn-ghost" id="btnPrev"'+(cur.pos===0?' disabled':'')+'>← 上一题</button>'
+    +'<button class="btn btn-ghost" id="btnJump">题目列表</button>'
+    +'<button class="btn btn-ghost next-hl" id="btnNext">'+(cur.pos===list.length-1?'回到开头 →':'下一题 →')+'</button>'
+    +'</div>';
+  inner += '<div class="pos-ind">'+(cur.pos+1)+' / '+list.length+' · '+secName(cur.sec)+(cur.sec==='all'?' · '+modeName(cur.mode):'')+'</div>';
+
+  box.innerHTML = '<div class="card">'+inner+'</div>';
+
+  /* 绑定交互 */
+  const optBox = $('#optBox');
+  if(optBox && !recite){
+    optBox.querySelectorAll('.opt').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        if(q.t==='multi'){ el.classList.toggle('picked'); }
+        else answerObjective(q, parseInt(el.dataset.i));
+      });
+    });
+  }
+  const subBtn = $('#btnSubmit');
+  if(subBtn) subBtn.addEventListener('click', ()=>submitMulti(q));
+  const peek = $('#btnPeek');
+  if(peek) peek.addEventListener('click', ()=>{
+    let h = '<div class="ans-panel"><div class="ans-hd">📖 参考答案</div><div class="ans-bd">'+esc(q.ans)+'</div></div>';
+    if(q.exp) h += '<div class="feedback info"><b>💡 解析</b><span class="exp">'+esc(q.exp)+'</span></div>';
+    h += '<div class="feedback ok" style="margin-top:10px"><b>看懂了？</b><span class="exp">点上方「✅ 标记已会」即可把本题移出错题本</span></div>';
+    $('#fb').innerHTML = h;
+  });
+  const master = $('#btnMaster');
+  if(master) master.addEventListener('click', ()=>markMastered(q));
+  $('#btnPrev').addEventListener('click', ()=>{ cur.pos=Math.max(0,cur.pos-1); renderQuiz(); });
+  $('#btnNext').addEventListener('click', ()=>{ const l=listFor(cur.sec); cur.pos=(cur.pos+1)%Math.max(1,l.length); renderQuiz(); });
+  $('#btnJump').addEventListener('click', showJumpList);
+}
+
+/* ═══════════════ 客观题判分（选择 + 对错判断 + 多选统一逻辑） ═══════════════ */
+function gradeObjective(q, picked){
+  if(answeredThisView) return;
+  answeredThisView = true;
+  const truth = truthArrOf(q);
+  const pk = [...picked].sort((x,y)=>x-y);
+  const ok = pk.length===truth.length && pk.every((v,i)=>v===truth[i]);
+  const wasWrong = S.status[q.id]==='wrong';
+  S.status[q.id] = ok ? 'correct' : 'wrong';
+  S.history.push({q:q.id, ok:ok, act:ok?'答对':'答错', t:Date.now()});
+  if(S.history.length>500) S.history = S.history.slice(-500);
+  save();
+  const box = $('#optBox');
+  box.querySelectorAll('.opt').forEach(el=>{
+    el.classList.add('locked');
+    const i = parseInt(el.dataset.i);
+    if(truth.includes(i)) el.classList.add('right');
+    else if(pk.includes(i)) el.classList.add('wrongpick');
+  });
+  let ansText;
+  if(q.t==='judge') ansText = truth[0]===0 ? 'A. 正确（对）' : 'B. 错误（错）';
+  else if(q.t==='multi') ansText = truth.map(i=>LETTERS[i]).join('、');
+  else ansText = LETTERS[q.a]+'. '+q.opts[q.a];
+  $('#fb').innerHTML = '<div class="feedback '+(ok?'ok':'no')+'"><b>'+(ok?'✅ 回答正确':'❌ 回答错误，正确答案：'+ansText)+'</b><span class="exp">'+esc(q.exp||'')+'</span></div>';
+  updateCounts();
+  if(ok && cur.sec==='wrong' && wasWrong) toast('🎉 答对了！本题已移出错题本');
+  else if(!ok) toast('❌ 已加入错题本，可去首页「错题」板块复习');
+}
+function answerObjective(q, pick){ gradeObjective(q, [pick]); }
+function submitMulti(q){
+  if(answeredThisView) return;
+  const picked = [...document.querySelectorAll('#optBox .opt.picked')].map(el=>parseInt(el.dataset.i));
+  if(!picked.length){ toast('请先勾选选项再提交'); return; }
+  gradeObjective(q, picked);
+}
+
+/* ═══════════════ 填空/主观题：标记已会 ═══════════════ */
+function markMastered(q){
+  if(S.mastered[q.id]){ toast('本题已是"已会"状态'); return; }
+  S.mastered[q.id] = true;
+  S.history.push({q:q.id, ok:true, act:'标记已会', t:Date.now()});
+  if(S.history.length>500) S.history = S.history.slice(-500);
+  save();
+  updateCounts();
+  toast('✅ 已标记"已会"，本题移出错题本');
+  renderQuiz(); // 列表自动刷新：错题/未做板块中本题消失，停留在原位显示下一题
+}
+
+/* ═══════════════ 题目列表（跳转） ═══════════════ */
+function showJumpList(){
+  const list = listFor(cur.sec);
+  let html = '<div class="overlay show" id="jumpOverlay"><div class="modal"><h2>'+secName(cur.sec)+' · '+list.length+' 题</h2><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:8px">';
+  list.forEach((q,i)=>{
+    const st = OBJ(q) ? S.status[q.id] : (S.mastered[q.id]?'correct':null);
+    const bg = st==='correct'?'var(--c-correct)':st==='wrong'?'var(--c-wrong)':(SUB(q)?'#D97706':'var(--c-border)');
+    html += '<button class="btn btn-ghost" data-i="'+i+'" style="padding:10px 0;font-size:13px;border-color:'+bg+';color:'+bg+';font-weight:700">'+q.id+'</button>';
+  });
+  html += '</div><div class="close-row"><button class="btn btn-primary" id="btnCloseJump">关闭</button></div></div></div>';
+  const div = document.createElement('div'); div.innerHTML = html; document.body.appendChild(div.firstChild);
+  $('#jumpOverlay').querySelectorAll('button[data-i]').forEach(b=>{
+    b.addEventListener('click', ()=>{ cur.pos=parseInt(b.dataset.i); closeJump(); renderQuiz(); });
+  });
+  $('#btnCloseJump').addEventListener('click', closeJump);
+  $('#jumpOverlay').addEventListener('click', e=>{ if(e.target.id==='jumpOverlay') closeJump(); });
+  function closeJump(){ const o=$('#jumpOverlay'); if(o) o.remove(); }
+}
+
+/* ═══════════════ 首页 / 模式页导航 ═══════════════ */
+$$('.sec-card').forEach(c=>c.addEventListener('click', ()=>{
+  const sec = c.dataset.sec;
+  if(sec==='all'){ showPage('pageMode'); }
+  else { openSection(sec); toast(sec==='undo'?'📝 继续推进未做的题目':'❌ 错题歼灭战开始'); }
+}));
+$$('.mode-card').forEach(c=>c.addEventListener('click', ()=>{
+  openSection('all', c.dataset.mode);
+  toast(c.dataset.mode==='recite' ? '📖 背题模式：只看不记，不影响未做/错题' : '✍️ 练习模式：答题计入统计与错题本');
+}));
+$('#backHome1').addEventListener('click', ()=>showPage('pageHome'));
+$('#btnBackQuiz').addEventListener('click', goBack);
+
+/* ═══════════════ 菜单 / 弹窗 ═══════════════ */
+function openOverlay(id){ $(id).classList.add('show'); }
+function closeOverlay(id){ $(id).classList.remove('show'); }
+['btnMenu','btnMenu2','btnMenu3'].forEach(id=>$('#'+id).addEventListener('click', ()=>{ renderHistory(); openOverlay('#menuOverlay'); }));
+$('#btnCloseMenu').addEventListener('click', ()=>closeOverlay('#menuOverlay'));
+$('#btnCloseHelp').addEventListener('click', ()=>closeOverlay('#helpOverlay'));
+$('#menuOverlay').addEventListener('click', e=>{ if(e.target.id==='menuOverlay') closeOverlay('#menuOverlay'); });
+$('#helpOverlay').addEventListener('click', e=>{ if(e.target.id==='helpOverlay') closeOverlay('#helpOverlay'); });
+
+function renderHistory(){
+  const box = $('#histBox');
+  if(!S.history.length){ box.innerHTML = '<p style="color:var(--c-text2)">暂无做题记录，快去刷第一题吧 ✍️</p>'; return; }
+  const recent = S.history.slice(-30).reverse();
+  box.innerHTML = recent.map(h=>{
+    const q = QS.find(x=>x.id===h.q);
+    return '<div class="hist-item"><span>#'+h.q+' '+(q?q.sec:'')+' · '+(q?q.q.slice(0,14):'')+'…</span><span>'+(h.ok?'<span class="r-ok">'+(h.act||'✓ 对')+'</span>':'<span class="r-no">'+(h.act||'✗ 错')+'</span>')+' '+fmtTime(h.t)+'</span></div>';
+  }).join('');
+}
+$('#btnReset').addEventListener('click', ()=>{
+  if(confirm('确定清空全部做题记录、错题本和进度吗？此操作不可恢复。')){
+    S = { status:{}, mastered:{}, history:[], last:null };
+    save(); updateCounts(); closeOverlay('#menuOverlay'); showPage('pageHome'); toast('已清空全部记录');
+  }
+});
+$('#btnExport').addEventListener('click', ()=>{
+  const data = JSON.stringify(S, null, 2);
+  if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(data); toast('进度数据已复制到剪贴板，可保存为文本备份'); }
+  else prompt('复制以下内容保存为备份：', data);
+});
+$('#btnImport').addEventListener('click', ()=>{
+  const raw = prompt('粘贴之前导出的进度数据：');
+  if(!raw) return;
+  try{
+    const p = JSON.parse(raw);
+    if(p && p.status!==undefined){
+      S = { status:p.status||{}, mastered:p.mastered||{}, history:p.history||[], last:p.last||null };
+      save(); updateCounts(); closeOverlay('#menuOverlay'); showPage('pageHome'); toast('导入成功 ✓');
+    } else toast('数据格式不正确');
+  }catch(e){ toast('导入失败：数据格式不正确'); }
+});
+
+/* ═══════════════ 键盘 ═══════════════ */
+document.addEventListener('keydown', e=>{
+  if(document.querySelector('.overlay.show') || e.target.tagName==='INPUT' || e.target.tagName==='TEXTAREA'){
+    if(e.key==='Escape') $$('.overlay.show').forEach(o=>o.classList.remove('show'));
+    return;
+  }
+  if(!$('#pageQuiz').classList.contains('active') || !cur) return;
+  const list = listFor(cur.sec);
+  if(!list.length) return;
+  const recite = (cur.sec==='all' && cur.mode==='recite');
+  if(e.key==='ArrowLeft'){ cur.pos=Math.max(0,cur.pos-1); renderQuiz(); }
+  else if(e.key==='ArrowRight'){ cur.pos=(cur.pos+1)%list.length; renderQuiz(); }
+  else if(e.key==='Enter'){
+    const q = list[cur.pos];
+    if(!recite && q && q.t==='multi' && !answeredThisView){ submitMulti(q); }
+    else { cur.pos=(cur.pos+1)%list.length; renderQuiz(); }
+  }
+  else if(!recite && !answeredThisView){
+    const q = list[cur.pos];
+    if(!q || !OBJ(q)) return;
+    if(q.t==='multi'){
+      let i = LETTERS.indexOf(e.key.toUpperCase());
+      if(i<0 && e.key>='1' && e.key<='9') i = parseInt(e.key)-1;
+      if(i>=0 && i<q.opts.length){ const el=document.querySelector('#optBox .opt[data-i="'+i+'"]'); if(el) el.classList.toggle('picked'); }
+    } else if(q.t==='choice'){
+      let i = 'ABCD'.indexOf(e.key.toUpperCase());
+      if(i<0 && e.key>='1' && e.key<='9') i = parseInt(e.key)-1;
+      if(i>=0 && i<q.opts.length) answerObjective(q, i);
+    } else {
+      const k = e.key.toUpperCase();
+      if(k==='A' || e.key==='1') answerObjective(q, 0);
+      else if(k==='B' || e.key==='2') answerObjective(q, 1);
+    }
+  }
+});
+
+/* ═══════════════ 打开时自动定位：上次做到的题的下一题 ═══════════════ */
+function routeFromHash(){
+  const h = location.hash.replace('#','');
+  if(h==='all'){ showPage('pageMode'); return true; }
+  if(h==='all/practice' || h==='all/recite'){ openSection('all', h.split('/')[1]); return true; }
+  if(h==='undo' || h==='wrong'){ openSection(h); return true; }
+  return false;
+}
+function autoLocate(){
+  if(!S.last || !S.last.sec) return false;
+  const sec = S.last.sec, mode = S.last.mode || 'practice';
+  if(listFor(sec).length === 0){ return false; }
+  cur = { sec:sec, mode:(sec==='all'&&mode==='recite')?'recite':'practice', pos:0 };
+  const list = listFor(sec);
+  let idx = list.findIndex(q=>q.id > S.last.qid);   // 上次那题的下一题
+  if(idx<0) idx = 0;
+  cur.pos = idx;
+  showPage('pageQuiz');
+  renderQuiz();
+  toast('📍 已定位到上次进度：第 '+list[idx].id+' 题（'+secName(sec)+'）');
+  return true;
+}
+
+/* ═══════════════ PWA：安装为浏览器应用 ═══════════════ */
+(function(){
+  function makeIcon(size){
+    const c = document.createElement('canvas'); c.width=c.height=size;
+    const g = c.getContext('2d');
+    const grad = g.createLinearGradient(0,0,size,size);
+    grad.addColorStop(0,'#2563EB'); grad.addColorStop(1,'#6FA8FF');
+    g.fillStyle=grad;
+    const r=size*0.22;
+    g.beginPath();
+    g.moveTo(r,0); g.lineTo(size-r,0); g.quadraticCurveTo(size,0,size,r); g.lineTo(size,size-r); g.quadraticCurveTo(size,size,size-r,size); g.lineTo(r,size); g.quadraticCurveTo(0,size,0,size-r); g.lineTo(0,r); g.quadraticCurveTo(0,0,r,0);
+    g.fill();
+    g.fillStyle='#fff'; g.textAlign='center'; g.textBaseline='middle';
+    g.font='bold '+Math.round(size*0.42)+'px "PingFang SC","Microsoft YaHei",sans-serif';
+    g.fillText('有机', size/2, size/2 - size*0.02);
+    g.font='bold '+Math.round(size*0.2)+'px "PingFang SC","Microsoft YaHei",sans-serif';
+    g.fillText('刷题', size/2, size/2 + size*0.3);
+    return c.toDataURL('image/png');
+  }
+  let deferredPrompt = null;
+  try{
+    const icon192 = makeIcon(192), icon512 = makeIcon(512);
+    const manifest = {
+      name:'有机化学考前刷题', short_name:'有机刷题',
+      description:'陆涛《有机化学》第9版配套考前刷题应用',
+      start_url: location.href.split('#')[0], scope: location.href.replace(/[^/]*$/,''),
+      display:'standalone', orientation:'portrait',
+      background_color:'#F3F4F6', theme_color:'#2563EB',
+      icons:[{src:icon192,sizes:'192x192',type:'image/png',purpose:'any'},
+             {src:icon512,sizes:'512x512',type:'image/png',purpose:'any'},
+             {src:icon512,sizes:'512x512',type:'image/png',purpose:'maskable'}]
+    };
+    const blob = new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
+    let link = document.querySelector('link[rel="manifest"]');
+    if(!link){ link=document.createElement('link'); document.head.appendChild(link); }
+    link.rel='manifest'; link.href=URL.createObjectURL(blob);
+    let fav=document.querySelector('link[rel="icon"]'); if(!fav){ fav=document.createElement('link'); document.head.appendChild(fav); }
+    fav.rel='icon'; fav.href=icon192;
+  }catch(e){}
+
+  window.addEventListener('beforeinstallprompt', e=>{
+    e.preventDefault(); deferredPrompt = e;
+    $('#btnInstall').classList.add('primary');
+  });
+  window.addEventListener('appinstalled', ()=>{ toast('🎉 安装成功！桌面已出现应用图标'); deferredPrompt=null; });
+
+  $('#btnInstall').addEventListener('click', async ()=>{
+    if(deferredPrompt){
+      deferredPrompt.prompt();
+      const c = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if(c && c.outcome==='accepted') toast('正在安装…');
+    } else {
+      $('#installHelp').textContent = location.protocol==='file:'
+        ? '当前是本地文件（file://）方式打开，浏览器出于安全限制不允许安装，但刷题和进度保存完全不受影响。想安装成独立应用：'
+        : '点击下方按钮没有弹出安装窗口？按以下步骤操作：';
+      openOverlay('#helpOverlay');
+    }
+  });
+})();
+
+/* ═══════════════ 启动 ═══════════════ */
+updateCounts();
+if(!routeFromHash()){
+  if(!autoLocate()){ showPage('pageHome'); }
+}
+</script>
+</body>
+</html>
