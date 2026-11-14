@@ -450,8 +450,8 @@ const truthArrOf = q => q.t==='judge' ? [q.a?0:1] : (q.t==='multi' ? [...q.a].so
 
 /* ═══════════════ 状态管理（localStorage，V2 结构） ═══════════════ */
 const KEY = 'ocExamPracticeV2';
-let S = { status:{}, mastered:{}, history:[], last:null };
-try{ const raw = localStorage.getItem(KEY); if(raw){ const p = JSON.parse(raw); S.status=p.status||{}; S.mastered=p.mastered||{}; S.history=p.history||[]; S.last=p.last||null; } }catch(e){}
+let S = { status:{}, picks:{}, mastered:{}, history:[], last:null };
+try{ const raw = localStorage.getItem(KEY); if(raw){ const p = JSON.parse(raw); S.status=p.status||{}; S.picks=p.picks||{}; S.mastered=p.mastered||{}; S.history=p.history||[]; S.last=p.last||null; } }catch(e){}
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 
 const isWrong = q => OBJ(q) ? S.status[q.id]==='wrong' : !S.mastered[q.id];
@@ -465,6 +465,7 @@ function listFor(sec){
 /* ═══════════════ 视图状态 ═══════════════ */
 let cur = null;              // {sec:'all'|'undo'|'wrong', mode:'practice'|'recite', pos}
 let answeredThisView = false;
+let redoQid = null;          // 正在重做的题目 id（该题暂不显示保留状态）
 
 /* ═══════════════ 工具 ═══════════════ */
 const $ = s => document.querySelector(s);
@@ -570,10 +571,28 @@ function renderQuiz(){
     /* ── 交互模式（练习/未做/错题） ── */
     if(OBJ(q)){
       const opts = q.t==='judge' ? ['正确','错误'] : q.opts;
+      const ta = truthArrOf(q);
+      /* 已做过的题：回到时保留上次所选选项与对错状态（重做中除外） */
+      const prev = (!recite && S.picks[q.id] && redoQid!==q.id) ? [...S.picks[q.id]].sort((x,y)=>x-y) : null;
       inner += '<div class="opts" id="optBox">';
-      opts.forEach((o,i)=>{ inner += '<div class="opt" data-i="'+i+'"><span class="letter">'+LETTERS[i]+'</span><span>'+esc(o)+'</span></div>'; });
-      inner += '</div>';
-      if(q.t==='multi') inner += '<div class="action-row"><button class="btn btn-primary" id="btnSubmit">☑️ 提交答案（多选：全部选对才得分）</button></div>';
+      if(prev){
+        const okPrev = prev.length===ta.length && prev.every((v,i)=>v===ta[i]);
+        opts.forEach((o,i)=>{
+          const cls = ta.includes(i) ? 'right' : (prev.includes(i) ? 'wrongpick' : '');
+          inner += '<div class="opt '+cls+' locked" data-i="'+i+'"><span class="letter">'+LETTERS[i]+'</span><span>'+esc(o)+'</span></div>';
+        });
+        inner += '</div>';
+        let ansText;
+        if(q.t==='judge') ansText = ta[0]===0 ? 'A. 正确（对）' : 'B. 错误（错）';
+        else if(q.t==='multi') ansText = ta.map(i=>LETTERS[i]).join('、');
+        else ansText = LETTERS[q.a]+'. '+q.opts[q.a];
+        inner += '<div class="feedback '+(okPrev?'ok':'no')+'"><b>'+(okPrev?'✅ 上次回答正确':'❌ 上次回答错误，正确答案：'+ansText)+'</b><span class="exp">'+esc(q.exp||'')+'</span></div>';
+        if(!okPrev) inner += '<div class="action-row"><button class="btn btn-ghost next-hl" id="btnRedo">🔄 重做本题</button></div>';
+      } else {
+        opts.forEach((o,i)=>{ inner += '<div class="opt" data-i="'+i+'"><span class="letter">'+LETTERS[i]+'</span><span>'+esc(o)+'</span></div>'; });
+        inner += '</div>';
+        if(q.t==='multi') inner += '<div class="action-row"><button class="btn btn-primary" id="btnSubmit">☑️ 提交答案（多选：全部选对才得分）</button></div>';
+      }
       inner += '<div id="fb"></div>';
     } else {
       /* 填空/主观题：查看参考答案 + 标记已会 */
@@ -605,6 +624,8 @@ function renderQuiz(){
   }
   const subBtn = $('#btnSubmit');
   if(subBtn) subBtn.addEventListener('click', ()=>submitMulti(q));
+  const redoBtn = $('#btnRedo');
+  if(redoBtn) redoBtn.addEventListener('click', ()=>redoQuestion(q));
   const peek = $('#btnPeek');
   if(peek) peek.addEventListener('click', ()=>{
     let h = '<div class="ans-panel"><div class="ans-hd">📖 参考答案</div><div class="ans-bd">'+esc(q.ans)+'</div></div>';
@@ -622,11 +643,12 @@ function renderQuiz(){
 function gradeObjective(q, picked){
   if(answeredThisView) return;
   answeredThisView = true;
+  redoQid = null;   // 重做完成，恢复正常保留状态
   const truth = truthArrOf(q);
   const pk = [...picked].sort((x,y)=>x-y);
   const ok = pk.length===truth.length && pk.every((v,i)=>v===truth[i]);
-  const wasWrong = S.status[q.id]==='wrong';
   S.status[q.id] = ok ? 'correct' : 'wrong';
+  S.picks[q.id] = pk;
   S.history.push({q:q.id, ok:ok, act:ok?'答对':'答错', t:Date.now()});
   if(S.history.length>500) S.history = S.history.slice(-500);
   save();
@@ -641,10 +663,11 @@ function gradeObjective(q, picked){
   if(q.t==='judge') ansText = truth[0]===0 ? 'A. 正确（对）' : 'B. 错误（错）';
   else if(q.t==='multi') ansText = truth.map(i=>LETTERS[i]).join('、');
   else ansText = LETTERS[q.a]+'. '+q.opts[q.a];
-  $('#fb').innerHTML = '<div class="feedback '+(ok?'ok':'no')+'"><b>'+(ok?'✅ 回答正确':'❌ 回答错误，正确答案：'+ansText)+'</b><span class="exp">'+esc(q.exp||'')+'</span></div>';
+  $('#fb').innerHTML = '<div class="feedback '+(ok?'ok':'no')+'"><b>'+(ok?'✅ 回答正确':'❌ 回答错误，正确答案：'+ansText)+'</b><span class="exp">'+esc(q.exp||'')+'</span></div>'
+    + (ok ? '' : '<div class="action-row"><button class="btn btn-ghost next-hl" id="btnRedo">🔄 重做本题</button></div>');
+  const rb = $('#btnRedo');
+  if(rb) rb.addEventListener('click', ()=>redoQuestion(q));
   updateCounts();
-  if(ok && cur.sec==='wrong' && wasWrong) toast('🎉 答对了！本题已移出错题本');
-  else if(!ok) toast('❌ 已加入错题本，可去首页「错题」板块复习');
 }
 function answerObjective(q, pick){ gradeObjective(q, [pick]); }
 function submitMulti(q){
@@ -653,16 +676,19 @@ function submitMulti(q){
   if(!picked.length){ toast('请先勾选选项再提交'); return; }
   gradeObjective(q, picked);
 }
+function redoQuestion(q){
+  redoQid = q.id;          // 重做中：该题暂不显示保留状态
+  renderQuiz();            // renderQuiz 会重置 answeredThisView，重新可作答
+}
 
 /* ═══════════════ 填空/主观题：标记已会 ═══════════════ */
 function markMastered(q){
-  if(S.mastered[q.id]){ toast('本题已是"已会"状态'); return; }
+  if(S.mastered[q.id]) return;
   S.mastered[q.id] = true;
   S.history.push({q:q.id, ok:true, act:'标记已会', t:Date.now()});
   if(S.history.length>500) S.history = S.history.slice(-500);
   save();
   updateCounts();
-  toast('✅ 已标记"已会"，本题移出错题本');
   renderQuiz(); // 列表自动刷新：错题/未做板块中本题消失，停留在原位显示下一题
 }
 
@@ -717,7 +743,7 @@ function renderHistory(){
 }
 $('#btnReset').addEventListener('click', ()=>{
   if(confirm('确定清空全部做题记录、错题本和进度吗？此操作不可恢复。')){
-    S = { status:{}, mastered:{}, history:[], last:null };
+    S = { status:{}, picks:{}, mastered:{}, history:[], last:null };
     save(); updateCounts(); closeOverlay('#menuOverlay'); showPage('pageHome'); toast('已清空全部记录');
   }
 });
@@ -732,7 +758,7 @@ $('#btnImport').addEventListener('click', ()=>{
   try{
     const p = JSON.parse(raw);
     if(p && p.status!==undefined){
-      S = { status:p.status||{}, mastered:p.mastered||{}, history:p.history||[], last:p.last||null };
+      S = { status:p.status||{}, picks:p.picks||{}, mastered:p.mastered||{}, history:p.history||[], last:p.last||null };
       save(); updateCounts(); closeOverlay('#menuOverlay'); showPage('pageHome'); toast('导入成功 ✓');
     } else toast('数据格式不正确');
   }catch(e){ toast('导入失败：数据格式不正确'); }
@@ -758,6 +784,7 @@ document.addEventListener('keydown', e=>{
   else if(!recite && !answeredThisView){
     const q = list[cur.pos];
     if(!q || !OBJ(q)) return;
+    if(S.picks[q.id] && redoQid!==q.id) return;  // 已作答且非重做中：保留状态，键盘不触发重判
     if(q.t==='multi'){
       let i = LETTERS.indexOf(e.key.toUpperCase());
       if(i<0 && e.key>='1' && e.key<='9') i = parseInt(e.key)-1;
