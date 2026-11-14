@@ -495,9 +495,15 @@ function updateCounts(){
   $('#cWrong').textContent = wrongCnt;
 }
 
-/* ═══════════════ 打开板块 ═══════════════ */
+/* ═══════════════ 打开板块（进入时自动定位到上次做到的题的下一题） ═══════════════ */
 function openSection(sec, mode){
   cur = { sec:sec, mode:(sec==='all'&&mode==='recite')?'recite':'practice', pos:0 };
+  /* 点进板块后再定位：练习类板块跳到上次做到的题的下一题；背题模式从头开始 */
+  if(S.last && cur.mode==='practice'){
+    const list = listFor(sec);
+    const idx = list.findIndex(q=>q.id > S.last.qid);
+    if(idx>=0) cur.pos = idx;
+  }
   showPage('pageQuiz');
   renderQuiz();
 }
@@ -547,7 +553,6 @@ function renderQuiz(){
 
   if(recite){
     /* ── 背题模式：直出答案，零写入 ── */
-    inner += '<div class="recite-banner">📖 背题模式：只看不记，不影响未做/错题</div>';
     if(OBJ(q)){
       const opts = q.t==='judge' ? ['正确','错误'] : q.opts;
       const ta = truthArrOf(q);
@@ -604,7 +609,6 @@ function renderQuiz(){
   if(peek) peek.addEventListener('click', ()=>{
     let h = '<div class="ans-panel"><div class="ans-hd">📖 参考答案</div><div class="ans-bd">'+esc(q.ans)+'</div></div>';
     if(q.exp) h += '<div class="feedback info"><b>💡 解析</b><span class="exp">'+esc(q.exp)+'</span></div>';
-    h += '<div class="feedback ok" style="margin-top:10px"><b>看懂了？</b><span class="exp">点上方「✅ 标记已会」即可把本题移出错题本</span></div>';
     $('#fb').innerHTML = h;
   });
   const master = $('#btnMaster');
@@ -685,11 +689,10 @@ function showJumpList(){
 $$('.sec-card').forEach(c=>c.addEventListener('click', ()=>{
   const sec = c.dataset.sec;
   if(sec==='all'){ showPage('pageMode'); }
-  else { openSection(sec); toast(sec==='undo'?'📝 继续推进未做的题目':'❌ 错题歼灭战开始'); }
+  else { openSection(sec); }
 }));
 $$('.mode-card').forEach(c=>c.addEventListener('click', ()=>{
   openSection('all', c.dataset.mode);
-  toast(c.dataset.mode==='recite' ? '📖 背题模式：只看不记，不影响未做/错题' : '✍️ 练习模式：答题计入统计与错题本');
 }));
 $('#backHome1').addEventListener('click', ()=>showPage('pageHome'));
 $('#btnBackQuiz').addEventListener('click', goBack);
@@ -771,27 +774,13 @@ document.addEventListener('keydown', e=>{
   }
 });
 
-/* ═══════════════ 打开时自动定位：上次做到的题的下一题 ═══════════════ */
+/* ═══════════════ 打开时仅恢复视图；定位在点进板块时才发生 ═══════════════ */
 function routeFromHash(){
   const h = location.hash.replace('#','');
   if(h==='all'){ showPage('pageMode'); return true; }
   if(h==='all/practice' || h==='all/recite'){ openSection('all', h.split('/')[1]); return true; }
   if(h==='undo' || h==='wrong'){ openSection(h); return true; }
   return false;
-}
-function autoLocate(){
-  if(!S.last || !S.last.sec) return false;
-  const sec = S.last.sec, mode = S.last.mode || 'practice';
-  if(listFor(sec).length === 0){ return false; }
-  cur = { sec:sec, mode:(sec==='all'&&mode==='recite')?'recite':'practice', pos:0 };
-  const list = listFor(sec);
-  let idx = list.findIndex(q=>q.id > S.last.qid);   // 上次那题的下一题
-  if(idx<0) idx = 0;
-  cur.pos = idx;
-  showPage('pageQuiz');
-  renderQuiz();
-  toast('📍 已定位到上次进度：第 '+list[idx].id+' 题（'+secName(sec)+'）');
-  return true;
 }
 
 /* ═══════════════ PWA：安装为浏览器应用 ═══════════════ */
@@ -857,9 +846,7 @@ function autoLocate(){
 
 /* ═══════════════ 启动 ═══════════════ */
 updateCounts();
-if(!routeFromHash()){
-  if(!autoLocate()){ showPage('pageHome'); }
-}
+if(!routeFromHash()){ showPage('pageHome'); }
 </script>
 </body>
 </html>
